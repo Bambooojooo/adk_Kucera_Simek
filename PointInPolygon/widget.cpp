@@ -28,7 +28,6 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_pushButtonAnalyze_clicked()
 {
-    std::cout << "cus" << std::endl;
 
   //Analyze position of the point and vertex
     QPoint q = ui->Canvas->getPoint();
@@ -42,6 +41,8 @@ void Widget::on_pushButtonAnalyze_clicked()
 	    pos = a.getPositionWinding(q, pol);
     else if (ui->comboBox->currentText() == "Ray crossing")
 	    pos = a.getPositionRay(q, pol);
+
+    std::cout << pos << std::endl;
 
     //Print results
     if (pos == 1)

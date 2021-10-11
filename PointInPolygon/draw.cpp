@@ -46,7 +46,7 @@ void Draw::mousePressEvent(QMouseEvent *event)
     if (add_vertex)
     {
         //Create new point
-        QPoint p(x,y);
+	QPoint p(x,y);
 
         //Add point to vector
         vertices.push_back(p);
