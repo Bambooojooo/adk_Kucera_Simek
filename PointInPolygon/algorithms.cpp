@@ -1,5 +1,7 @@
 #include "algorithms.h"
 #include <cmath>
+#include <vector>
+#include <iostream>
 
 Algorithms::Algorithms()
 {
@@ -90,4 +92,47 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
 
     //Point outside polygon
     return 0;
+}
+
+int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
+{
+	// Analyze position of a point and polygon via Ray crossing algorithm
+	int n = pol.size();
+	int k = 0;
+	double x_, y_;
+	double x_m;
+	double eps = 1.0e-5;
+	std::vector<QPoint> p_;
+
+	//Process all segments of polygon
+	for (int i = 0; i<n; i++)
+	{
+		// Compute local coordinates
+		x_ = pol[i].x() - q.x();
+		y_ = pol[i].y() - q.y();
+
+		// Making QPoint object from local coords
+		QPoint p(x_,y_);
+
+		// Adding QPoint of local coords to vector p_
+		p_.push_back(p);
+
+		// Counting amount of points intersecting axis x
+		if ((p_[i].y() > 0 && p_[(i-1)%n].y() < eps) || (p_[(i-1)%n].y() > 0 && p_[i].y() < eps))
+		{
+			// Evaluate x coord of a point intersecting axis x
+			x_m = (p_[i].x() * p_[(i-1)%n].y() - p_[(i-1)%n].x() * p_[i].y())/(p_[i].y() - p_[(i-1)%n].y());
+			std::cout << x_m << std::endl;
+			// Increments k if x coord is in first or fourth quadrant
+			if (x_m > 0)
+				k++;
+		}
+	}
+
+	// Point outside polygon
+	if (k%2 == 0)
+		return 0;
+	// Point inside polygon
+	else
+		return 1;
 }
