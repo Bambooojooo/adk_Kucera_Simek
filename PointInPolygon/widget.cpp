@@ -38,6 +38,8 @@ void Widget::on_pushButtonAnalyze_clicked()
     //Print results
     if (pos == 1)
         ui->label->setText("Inside");
-    else
+    else if (pos == 0)
         ui->label->setText("Outside");
+    else
+	ui->label->setText("On the border");
 }
