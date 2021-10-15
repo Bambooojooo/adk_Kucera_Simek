@@ -12,6 +12,8 @@ public:
     double get2LinesAngle(QPoint &p1, QPoint &p2, QPoint &p3, QPoint &p4);
     int getPositionWinding(QPoint &q, std::vector<QPoint> &pol);
     int getPositionRay(QPoint &q, std::vector<QPoint> &pol);
+    std::vector<QPoint> getLocalCoords(QPoint &q, std::vector<QPoint> &pol);
+    bool ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol);
 };
 
 #endif // ALGORITHMS_H

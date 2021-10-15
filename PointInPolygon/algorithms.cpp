@@ -8,6 +8,28 @@ Algorithms::Algorithms()
 
 }
 
+bool Algorithms::ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol)
+{
+	// Decide whether the point q is close to any polygon point
+	int n = pol.size();
+	double eps = 4.1;
+	double dist;
+
+	//Process all segments of polygon
+	for (int i = 0; i<n; i++)
+	{
+		// Calculate distance of each point of polygon to point q
+		dist = sqrt((pol[i].x()-q.x()) * (pol[i].x()-q.x()) + (pol[i].y()-q.y()) * (pol[i].y()-q.y()));
+
+		//Point q is near of a polygon point
+		if (dist < eps)
+			return 1;
+	}
+
+	//Point q is not near of any polygon point
+	return 0;
+}
+
 int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
 {
     //Analyze point and line position
@@ -94,15 +116,10 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
     return 0;
 }
 
-int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
+std::vector<QPoint> Algorithms::getLocalCoords(QPoint &q, std::vector<QPoint> &pol)
 {
-	// Analyze position of a point and polygon via Ray crossing algorithm
 	int n = pol.size();
-	int k = 0;
 	int x_, y_;
-	double x_m;
-	double eps = 3.5;
-
 	std::vector<QPoint> p_;
 
 	//Process all segments of polygon
@@ -122,29 +139,56 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 		// Adding QPoint of local coords to vector p_
 		p_.push_back(p);
 	}
+	return p_;
+}
+
+int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
+{
+	// Analyze position of a point and polygon via Ray crossing algorithm
+	int n = pol.size();
+	int k = 0;
+	double x_m, y_m;
+	double eps = 4.1;
+
+	std::vector<QPoint> p_ = Algorithms::getLocalCoords(q, pol);
 
 	for (int i = 0; i<n; i++)
 	{
-		bool prd = ((p_[i].y() > 0 && p_[(i-1+n)%n].y() < eps) || (p_[(i-1+n)%n].y() > 0 && p_[i].y() < eps));
-		std::cout << "prd : " << prd << std::endl;
-		std::cout << "p_[" << i << "].y : " << p_[i].y() << std::endl;
-		std::cout << "p_[" << (i-1+n)%n << "].y : " << p_[(i-1+n)%n].y() << std::endl;
+
+		//Bools if there are intersections of axis and polygon edges
+		bool ifAxisXIntersection = ((p_[i].y() > 0 && p_[(i-1+n)%n].y() < eps) || (p_[(i-1+n)%n].y() > 0 && p_[i].y() < eps));
+		bool ifAxisYIntersection = ((p_[i].x() > 0 && p_[(i-1+n)%n].x() < eps) || (p_[(i-1+n)%n].x() > 0 && p_[i].x() < eps));
+
+		//std::cout << "Oy : " << ifAxisYIntersection << std::endl;
+		//std::cout << "p_[" << i << "].y : " << p_[i].y() << std::endl;
+		//std::cout << "p_[" << (i-1+n)%n << "].y : " << p_[(i-1+n)%n].y() << std::endl;
 
 		// Counting amount of points intersecting axis x
-		if ((p_[i].y() > 0 && p_[(i-1+n)%n].y() < eps) || (p_[(i-1+n)%n].y() > 0 && p_[i].y() < eps))
+		if (ifAxisXIntersection || ifAxisYIntersection)
 		{
-			// Evaluate x coord of a point intersecting axis x
-			x_m = (p_[i].x() * p_[(i-1+n)%n].y() - p_[(i-1+n)%n].x() * p_[i].y())/(p_[i].y() - p_[(i-1+n)%n].y());
-			std::cout << "x_m : " << x_m << std::endl;
-			// Increments k if x coord is in first or fourth quadrant
-			if (x_m > eps)
-				k++;
-			else if (fabs(x_m) < eps)
+			// X coord of axis x intersection
+			x_m = (-1) * (p_[i].x() * p_[(i-1+n)%n].y() - p_[(i-1+n)%n].x() * p_[i].y())/(p_[i].y() - p_[(i-1+n)%n].y());
+			std::cout << "hrana " << (i-1+n)%n << " " << i << std::endl;
+			std::cout << "x_m : " << x_m << ", so: " << (fabs(x_m) < eps) << std::endl;
+
+			// Y coord of axis y intersection
+			y_m = (-1) * (p_[(i-1+n)%n].x() * (p_[(i-1+n)%n].y() - p_[i].y()) / (p_[i].x() - p_[(i-1+n)%n].x()) + p_[(i-1+n)%n].y());
+			//std::cout << "y_m : " << y_m << ", so: " << (fabs(y_m) < eps) << std::endl;
+
+
+			// Return "on the border" if intersection is too close to any axis
+			if (fabs(x_m) < eps || fabs(y_m) < eps)
 				return -1;
+			// Increment k number (number of intersections of a polygon edges with axis x on its first and fourth quadrant
+			else if (x_m > eps && ifAxisXIntersection)
+				k++;
+
 		}
+
 	}
 	//std::cout << "k : " << k << std::endl;
 	// Point outside polygon
+	std::cout << "k: " << k << std::endl;
 	if (k%2 == 0)
 		return 0;
 	// Point inside polygon

@@ -37,10 +37,15 @@ void Widget::on_pushButtonAnalyze_clicked()
     Algorithms a;
     int pos;
 
-    if (ui->comboBox->currentText() == "Winding number")
-	    pos = a.getPositionWinding(q, pol);
-    else if (ui->comboBox->currentText() == "Ray crossing")
-	    pos = a.getPositionRay(q, pol);
+    if (a.ifCloseToPoint(q, pol))
+	    pos = 2;
+    else
+    {
+	    if (ui->comboBox->currentText() == "Winding number")
+		    pos = a.getPositionWinding(q, pol);
+	    else if (ui->comboBox->currentText() == "Ray crossing")
+		    pos = a.getPositionRay(q, pol);
+    }
 
     std::cout << pos << std::endl;
 
@@ -49,8 +54,10 @@ void Widget::on_pushButtonAnalyze_clicked()
 	ui->label->setText("Inside");
     else if (pos == 0)
 	ui->label->setText("Outside");
-    else
+    else if (pos == -1)
 	ui->label->setText("On the border");
+    else if (pos == 2)
+	ui->label->setText("On the vertex");
 
 
 }
