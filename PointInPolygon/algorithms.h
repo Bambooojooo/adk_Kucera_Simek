@@ -14,6 +14,8 @@ public:
     int getPositionRay(QPoint &q, std::vector<QPoint> &pol);
     std::vector<QPoint> getLocalCoords(QPoint &q, std::vector<QPoint> &pol);
     bool ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol);
+
+    int processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg);
 };
 
 #endif // ALGORITHMS_H

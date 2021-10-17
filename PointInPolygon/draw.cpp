@@ -7,6 +7,8 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     q.setX(-100);
     q.setY(-100);
     add_vertex = true;
+    add_polygons = false;
+
 }
 
 void Draw::paintEvent(QPaintEvent *event)
@@ -19,19 +21,24 @@ void Draw::paintEvent(QPaintEvent *event)
     QPolygon pol;
 
     //Convert vector to polygon
-    for (int i = 0; i < vertices.size(); i++){
-        pol.append(vertices[i]);
+    if (not add_polygons)
+    {
+	    for (int i = 0; i < vertices.size(); i++)
+	    {
+		pol.append(vertices[i]);
+	    }
+
+	    polygons.push_back(pol);
     }
 
     //Draw point q
     painter.drawEllipse(q.x()-4, q.y()-4, 8, 8);
 
-    //Draw polygon
-    painter.drawPolygon(pol);
-
-    //Improvements
-    //for( QPoint vertex : vertices)
-    //    pol.append(vertex);
+    //Draw polygons
+    for(QPolygon polg : polygons)
+    {
+	painter.drawPolygon(polg);
+    }
 
     painter.end();
 }
@@ -68,4 +75,15 @@ void Draw::clear()
     //Clear and repaint
     vertices.clear();
     repaint();
+}
+
+void Draw::drawPolygons(std::vector<QPolygon> &pols)
+{
+	vertices.clear();
+	polygons.clear();
+	for (QPolygon pol : pols)
+		polygons.push_back(pol);
+
+	repaint();
+
 }

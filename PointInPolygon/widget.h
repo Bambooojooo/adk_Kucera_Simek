@@ -22,6 +22,8 @@ private slots:
 
     void on_pushButtonAnalyze_clicked();
 
+    void on_pushButtonLoad_clicked();
+
 private:
     Ui::Widget *ui;
 };

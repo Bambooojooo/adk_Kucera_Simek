@@ -195,3 +195,30 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 	else
 		return 1;
 }
+
+int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg)
+{
+	//Get position
+	std::vector<QPoint> points;
+	int pos;
+
+	for (QPolygon pol : pols)
+	{
+		for (QPoint point : pol)
+			points.push_back(point);
+		//On the vertex
+		if (this->ifCloseToPoint(q, points))
+		{
+			return 2;
+		}
+		else
+		{
+			if (Alg == "Winding number")
+				pos = this->getPositionWinding(q, points);
+			else if (Alg == "Ray crossing")
+				pos = this->getPositionRay(q, points);
+		}
+	}
+
+	return pos;
+}

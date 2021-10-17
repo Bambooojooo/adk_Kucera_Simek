@@ -9,9 +9,11 @@ class Draw : public QWidget
     Q_OBJECT
 
 private:
+    std::vector<QPolygon> polygons;
     std::vector<QPoint> vertices;
     QPoint q;
     bool add_vertex;
+    bool add_polygons;
 
 public:
     explicit Draw(QWidget *parent = nullptr);
@@ -19,8 +21,11 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void clear();
     void changeStatus(){add_vertex = !add_vertex;}
+    void polygonStatus(){add_polygons = !add_polygons;}
     QPoint getPoint(){return q;}
-    std::vector<QPoint> getPolygon(){return vertices;}
+    std::vector<QPoint> getVertices(){return vertices;}
+    std::vector<QPolygon> getPolygons(){return polygons;}
+    void drawPolygons(std::vector<QPolygon> &pols);
 signals:
 
 public slots:
