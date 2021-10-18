@@ -3,6 +3,8 @@
 #include <QtGui>
 #include <vector>
 
+#include <draw.h>
+
 
 class Algorithms
 {
@@ -15,7 +17,7 @@ public:
     std::vector<QPoint> getLocalCoords(QPoint &q, std::vector<QPoint> &pol);
     bool ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol);
 
-    int processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg);
+    int processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg, std::vector<int> &results);
 };
 
 #endif // ALGORITHMS_H

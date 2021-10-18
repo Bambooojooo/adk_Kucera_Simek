@@ -42,10 +42,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 
 	// Extract each column name
 	while(std::getline(ss, colname, ',')){
-
-	    // Initialize and add <colname, int vector> pairs to result
-//	    result.push_back({colname, std::vector<QPoint> {}});
-//		std::cout << "colname: " << colname << std::endl;
 	}
     }
 
@@ -78,12 +74,9 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 		//Column cursor is on coords column
 		if (colId > 1)
 		{
-//			std::cout << value << std::endl;
 			//Skip blanks made by getline method
 			if (value != "")
 			{
-//					std::cout << "Printing value: " << value << std::endl;
-
 				//If coordinate pair incomplete (must include both x and y)
 				if (pairIterator != 2)
 				{
@@ -106,8 +99,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 					QPoint p(x,y);
 					polygon << p;
 
-					// Add the current integer to the 'colId' column's values vector
-//						result.at(colId).second.push_back(p);
 					pairIterator = 0;
 					pointsAmount++;
 				}
@@ -122,7 +113,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 
     // Close file
     myFile.close();
-    std::cout << "Size of result: " << result.size() << std::endl;
 
     return result;
 }

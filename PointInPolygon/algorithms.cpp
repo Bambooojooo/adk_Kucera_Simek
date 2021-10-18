@@ -1,4 +1,6 @@
 #include "algorithms.h"
+#include "draw.h"
+
 #include <cmath>
 #include <vector>
 #include <iostream>
@@ -33,7 +35,7 @@ bool Algorithms::ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol)
 int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
 {
     //Analyze point and line position
-    double eps = 1.0e-10;
+    double eps = 1.0e-9;
 
     //Coordinate differences
     double ux=p2.x()-p1.x();
@@ -94,11 +96,14 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
         double omega = get2LinesAngle(pol[i], q, pol[(i+1)%n], q);
 
 	//
-	if (fabs(omega - M_PI) < eps_border || fabs(omega) < eps_border)
-		return -1;
+//	if (fabs(omega - M_PI) < eps_border || fabs(omega) < eps_border)
+//		return -1;
 
         // Point and line segment position
         int pos = getPointLinePosition(q, pol[i], pol[(i+1)%n]);
+
+	if (pos == -1)
+		return -1;
 
         //Point in the left halfplane
         if (pos==1)
@@ -108,7 +113,7 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
     }
 
     //Point inside polygon
-    double eps = 1.0e-5;
+    double eps = 1.0e-4;
     if (fabs(fabs(omega_sum) - 2*M_PI) < eps)
         return 1;
 
@@ -128,10 +133,6 @@ std::vector<QPoint> Algorithms::getLocalCoords(QPoint &q, std::vector<QPoint> &p
 		// Compute local coordinates
 		x_ = pol[i].x() - q.x();
 		y_ = pol[i].y() - q.y();
-
-//		std::cout << "p_[" << i << "].y - " << "q.y()" << std::endl;
-//		std::cout << pol[i].y() <<" - " << q.y() << std::endl;
-//		std::cout << y_ << std::endl;
 
 		// Making QPoint object from local coords
 		QPoint p(x_,y_);
@@ -159,21 +160,14 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 		bool ifAxisXIntersection = ((p_[i].y() > 0 && p_[(i-1+n)%n].y() < eps) || (p_[(i-1+n)%n].y() > 0 && p_[i].y() < eps));
 		bool ifAxisYIntersection = ((p_[i].x() > 0 && p_[(i-1+n)%n].x() < eps) || (p_[(i-1+n)%n].x() > 0 && p_[i].x() < eps));
 
-		//std::cout << "Oy : " << ifAxisYIntersection << std::endl;
-		//std::cout << "p_[" << i << "].y : " << p_[i].y() << std::endl;
-		//std::cout << "p_[" << (i-1+n)%n << "].y : " << p_[(i-1+n)%n].y() << std::endl;
-
 		// Counting amount of points intersecting axis x
 		if (ifAxisXIntersection || ifAxisYIntersection)
 		{
 			// X coord of axis x intersection
 			x_m = (-1) * (p_[i].x() * p_[(i-1+n)%n].y() - p_[(i-1+n)%n].x() * p_[i].y())/(p_[i].y() - p_[(i-1+n)%n].y());
-			std::cout << "hrana " << (i-1+n)%n << " " << i << std::endl;
-			std::cout << "x_m : " << x_m << ", so: " << (fabs(x_m) < eps) << std::endl;
 
 			// Y coord of axis y intersection
 			y_m = (-1) * (p_[(i-1+n)%n].x() * (p_[(i-1+n)%n].y() - p_[i].y()) / (p_[i].x() - p_[(i-1+n)%n].x()) + p_[(i-1+n)%n].y());
-			//std::cout << "y_m : " << y_m << ", so: " << (fabs(y_m) < eps) << std::endl;
 
 
 			// Return "on the border" if intersection is too close to any axis
@@ -186,9 +180,8 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 		}
 
 	}
-	//std::cout << "k : " << k << std::endl;
+
 	// Point outside polygon
-	std::cout << "k: " << k << std::endl;
 	if (k%2 == 0)
 		return 0;
 	// Point inside polygon
@@ -196,29 +189,57 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 		return 1;
 }
 
-int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg)
+int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg, std::vector<int> &results)
 {
 	//Get position
 	std::vector<QPoint> points;
 	int pos;
+	int result = 0;
+	std::vector<int> positions;
 
 	for (QPolygon pol : pols)
 	{
+		points.clear();
 		for (QPoint point : pol)
+		{
 			points.push_back(point);
+		}
+
 		//On the vertex
 		if (this->ifCloseToPoint(q, points))
 		{
-			return 2;
+			pos = 2;
+			results.push_back(pos);
 		}
 		else
 		{
 			if (Alg == "Winding number")
+			{
 				pos = this->getPositionWinding(q, points);
+				std::cout << pos << std::endl;
+				results.push_back(pos);
+			}
 			else if (Alg == "Ray crossing")
+			{
 				pos = this->getPositionRay(q, points);
+				results.push_back(pos);
+			}
+		}
+		positions.push_back(pos);
+	}
+
+	for(int position : positions)
+	{
+		if (position == 2)
+			return 2;
+		else
+		{
+			if (position == -1)
+				result = -1;
+			else if (position != -1 && result != -1 && result != 1)
+				result = position;
 		}
 	}
 
-	return pos;
+	return result;
 }

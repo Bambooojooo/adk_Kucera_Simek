@@ -4,6 +4,7 @@
 #include "csv.h"
 #include "draw.h"
 
+#include <QFileDialog>
 #include <string>
 #include <iostream>
 
@@ -40,20 +41,14 @@ void Widget::on_pushButtonAnalyze_clicked()
 
     //Get position
     Algorithms a;
+    Draw drawObject;
     int pos;
     QString Alg = ui->comboBox->currentText();
+    std::vector<int> results;
 
-    pos = a.processPolygons(q, pols, Alg);
-
-//    if (a.ifCloseToPoint(q, pol))
-//	    pos = 2;
-//    else
-//    {
-//	    if (ui->comboBox->currentText() == "Winding number")
-//		    pos = a.getPositionWinding(q, pol);
-//	    else if (ui->comboBox->currentText() == "Ray crossing")
-//		    pos = a.getPositionRay(q, pol);
-//    }
+    pos = a.processPolygons(q, pols, Alg, results);
+    ui->Canvas->addResults(results);
+    results.clear();
 
 
     //Print results
@@ -66,27 +61,18 @@ void Widget::on_pushButtonAnalyze_clicked()
     else if (pos == 2)
 	ui->label->setText("On the vertex");
 
-
+    ui->Canvas->repaint();
 }
 
 void Widget::on_pushButtonLoad_clicked()
 {
-	// Read three_cols.csv and ones.csv
-//	std::vector<std::pair<std::string, std::vector<int>>> three_cols = read_csv("three_cols.csv");
-//	std::vector<std::pair<std::string, std::vector<int>>> ones = read_csv("ones.csv");
-
 	CSV csvObject;
 
-	std::string filename = "csv_body.csv";
+	QString path(QFileDialog::getOpenFileName(this, tr("Open file with polygons"), "../", tr("CSV Files (*.csv)")));
+	std::string filename = path.toStdString();
 
 	std::vector<QPolygon> polygonVector = csvObject.read_csv(filename);
 
-//	int n = polygonVector.size();
-//	std::cout << "Printing result with size: " << n << std::endl;
-//	for (int i = 0; i < n; i++)
-//	{
-//			std::cout << "Polygon: [x="  << polygonVector[i].x() << ",y=" << polygonVector[i].y() << "]" << std::endl;
-//	}
 	//Polygonstatus changes add_polygon bool to true, cause we are painting polygons right now
 	ui->Canvas->polygonStatus();
 
