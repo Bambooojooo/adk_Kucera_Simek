@@ -4,6 +4,7 @@
 
 Draw::Draw(QWidget *parent) : QWidget(parent)
 {
+    //Constructor
     q.setX(-100);
     q.setY(-100);
     add_vertex = true;
@@ -12,11 +13,13 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
 
 void Draw::paintEvent(QPaintEvent *event)
 {
+    //Paints polygons on canvas (widget object) by calling repaint() method
+
     // Create graphic object
     QPainter painter(this);
     painter.begin(this);
 
-    //set color of highlighted polygon
+    //Set color and brush (fill polygon with color) to highlight polygons
     QBrush brush;
     brush.setColor(Qt::green);
     brush.setStyle(Qt::SolidPattern);
@@ -32,13 +35,13 @@ void Draw::paintEvent(QPaintEvent *event)
 	    {
 		pol.append(vertices[i]);
 	    }
-
 	    polygons.push_back(pol);
     }
 
-    //Draw polygons
+    //Highlight polygons
     for(int i = 0; i<polygonResults.size(); i++)
     {
+	    //Highlight all polygons where point is not outside
 	    if (polygonResults[i] != 0)
 	    {
 		    path.addPolygon(polygons[i]);
@@ -48,6 +51,7 @@ void Draw::paintEvent(QPaintEvent *event)
 
     }
 
+    //Draw all polygons
     for(int i = 0; i<polygons.size(); i++)
     {
 	painter.drawPolygon(polygons[i]);
@@ -58,7 +62,6 @@ void Draw::paintEvent(QPaintEvent *event)
     painter.drawEllipse(q.x()-4, q.y()-4, 8, 8);
 
     painter.end();
-
     polygonResults.clear();
 }
 
@@ -99,17 +102,17 @@ void Draw::clear()
 
 void Draw::drawPolygons(std::vector<QPolygon> &pols)
 {
+	//Draw vector of polygons by simply pushing back to a polygons vector (private variable)
 	vertices.clear();
 	polygons.clear();
 	for (QPolygon pol : pols)
 		polygons.push_back(pol);
-
 	repaint();
-
 }
 
 void Draw::addResults(std::vector<int> &results)
 {
+	//Append every result to determine which polygon is gonna be highlighted
 	for (int result : results)
 		polygonResults.push_back(result);
 }

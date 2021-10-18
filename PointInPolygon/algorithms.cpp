@@ -35,7 +35,8 @@ bool Algorithms::ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol)
 int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
 {
     //Analyze point and line position
-    double eps = 1.0e-9;
+    double eps = 1.0e-11;
+//    double eps = 8;
 
     //Coordinate differences
     double ux=p2.x()-p1.x();
@@ -50,6 +51,7 @@ int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
     //Point in the left halfplane
     if (t > eps)
         return 1;
+    std::cout << "t: " << t << std::endl;
 
     //Point in the right halfplane
     if (t < -eps)
@@ -191,51 +193,68 @@ int Algorithms::getPositionRay(QPoint &q, std::vector<QPoint> &pol)
 
 int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString &Alg, std::vector<int> &results)
 {
-	//Get position
+	//Analyze position of a point to a vector of polygons and also store each position to a results vector
 	std::vector<QPoint> points;
 	int pos;
 	int result = 0;
+	int o = 0;
 	std::vector<int> positions;
 
+	//Iterate through each polygon to analyze position of a point
 	for (QPolygon pol : pols)
 	{
+		//Clear vector of points where polygon vertices will be stored
 		points.clear();
+
+		//Split each polygon to points for analytic algorithms
 		for (QPoint point : pol)
 		{
 			points.push_back(point);
 		}
 
-		//On the vertex
+		//Point on the vertex
 		if (this->ifCloseToPoint(q, points))
 		{
 			pos = 2;
 			results.push_back(pos);
 		}
+
+		//Analyze position of a point using algorithms
 		else
 		{
+			//Winding number algorithm
 			if (Alg == "Winding number")
 			{
 				pos = this->getPositionWinding(q, points);
-				std::cout << pos << std::endl;
 				results.push_back(pos);
+				std::cout << points.size() << std::endl;
+				o++;
 			}
+			//Ray crossing algorithm
 			else if (Alg == "Ray crossing")
 			{
 				pos = this->getPositionRay(q, points);
 				results.push_back(pos);
 			}
 		}
+
+		//Store position of a point compared to each polygon
 		positions.push_back(pos);
+		std::cout << "o: " << o << std::endl;
 	}
 
+	//Determine whether the point is on the vertex, on the line, inside or outside of polygons
 	for(int position : positions)
 	{
+		//On the vertex
 		if (position == 2)
 			return 2;
 		else
 		{
+			//On the line
 			if (position == -1)
 				result = -1;
+			//If not on the line or inside
 			else if (position != -1 && result != -1 && result != 1)
 				result = position;
 		}

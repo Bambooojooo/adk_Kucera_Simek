@@ -16,8 +16,7 @@ CSV::CSV()
 
 std::vector<QPolygon> CSV::read_csv(std::string &filename)
 {
-    // Reads a CSV file into a vector of <string, vector<int>> pairs where
-    // each pair represents <column name, column values>
+    // Reads a CSV file into a vector of QPolygons
 
     // Create a vector of <string, int vector> pairs to store the result
     std::vector<QPolygon> result;
@@ -51,8 +50,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 	//Remove quotes from line string
 	line.erase(remove(line.begin(), line.end(), '"'), line.end());
 
-	std::cout << "Line: " << line << std::endl;
-
 	// Create a stringstream of the current line
 	std::stringstream ss(line);
 
@@ -69,8 +66,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 	//Go through every object in csv line
 	while(std::getline(ss, value, ','))
 	{
-		int pointsAmount = 0;
-
 		//Column cursor is on coords column
 		if (colId > 1)
 		{
@@ -83,24 +78,25 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 					//If there is x coor to read
 					if (pairIterator%2 == 0)
 					{
+						//Convert string value to integer value
 						x = std::stoi(value);
 						pairIterator++;
 					}
 					//If there is y coor to read
 					else
 					{
+						//Convert string value to integer value
 						y = std::stoi(value);
 						pairIterator++;
 					}
 				}
 
+				//Store the pair of coordinates and reset pair iterator
 				if (pairIterator == 2)
 				{
 					QPoint p(x,y);
 					polygon << p;
-
 					pairIterator = 0;
-					pointsAmount++;
 				}
 			}
 		}
@@ -108,6 +104,8 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 	    // Increment the column index
 	    colId++;
 	}
+
+	//Store the object of a line
 	result.push_back(polygon);
     }
 
