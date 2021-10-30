@@ -303,8 +303,6 @@ QPolygon Algorithms::weightedBisector(std::vector <QPoint> &points)
 {
 	//Create enclosing rectangle using weighted bisector method
 	int n = points.size();
-	double sigma = 0, si_sum = 0;
-	std::vector<int> begin_point, end_point;
 	std::vector<std::pair<double, double>> lengths_angles;
 
 	//Compute lengths of every diagonal and its direction and store as a pair
@@ -345,6 +343,58 @@ QPolygon Algorithms::weightedBisector(std::vector <QPoint> &points)
 	double sigma_main = (s1*sigma1 + s2*sigma2) / (s1+s2);
 
 	//Rotate by -sigma
+	std::vector<QPoint> r_points = rotate(points, -sigma_main);
+
+	//Create min-max box
+	auto [mmb, area] = minMaxBox(r_points);
+
+	//Create enclosing rectangle
+	std::vector<QPoint> er = rotate(mmb, sigma_main);
+
+	//Resize rectangle, preserve area of the building
+	std::vector<QPoint> err = resizeRectangle(points,er);
+
+	//Create QPolygon
+	QPolygon er_pol;
+	er_pol.append(err[0]);
+	er_pol.append(err[1]);
+	er_pol.append(err[2]);
+	er_pol.append(err[3]);
+
+	return er_pol;
+}
+
+QPolygon Algorithms::longestEdge(std::vector <QPoint> &points)
+{
+	//Create enclosing rectangle using Longest Edge method
+	int n = points.size();
+	std::vector<std::pair<double, double>> lengths_angles;
+
+	//Compute lengths of every edge and its direction and store as a pair
+	for(int i=0; i<n; i++)
+	{
+		//Coordinate differences
+		double dx = points[i].x()-points[(i+1)%n].x();
+		double dy = points[i].y()-points[(i+1)%n].y();
+
+		//Compute length of edge
+		double s = sqrt(dx*dx + dy*dy);
+
+		//Compute direction of edge
+		double sigma = atan2(dy,dx);
+		if (sigma < 0)
+		    sigma += 2*M_PI;
+
+		lengths_angles.push_back(std::make_pair(s, sigma));
+	}
+
+	//Sort lengths of edges in ascending order
+	std::sort(lengths_angles.begin(), lengths_angles.end());
+
+	//Store direction of longest edge
+	double sigma_main = lengths_angles.back().second;
+
+	//Rotate by -sigma main
 	std::vector<QPoint> r_points = rotate(points, -sigma_main);
 
 	//Create min-max box

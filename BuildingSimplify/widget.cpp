@@ -47,14 +47,12 @@ void Widget::on_pushButton_clicked()
     else if (ui->comboBox->currentText() == "Longest Edge")
     {
 	//Longest Edge
-	std::cout << "Longest Edge is not still implemented" << std::endl;
-	er = a.weightedBisector(points);
+	er = a.longestEdge(points);
     }
 
     else if (ui->comboBox->currentText() == "Weighted Bisector")
     {
 	//Weighted Bisector
-	std::cout << "Weighted Bisector is not still implemented" << std::endl;
 	er = a.weightedBisector(points);
     }
 
