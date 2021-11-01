@@ -9,18 +9,26 @@ class Draw : public QWidget
 {
     Q_OBJECT
 private:
-    std::vector<QPoint> points;
+    bool add_polygons;
     QPolygon ch, er;
+    std::vector<QPoint> points;
+    std::vector<QPolygon> polygons, chs, ers;
+
+
 
 public:
     explicit Draw(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void clear();
+    void clearDrawing();
+    void clearData();
     std::vector<QPoint> getPoints(){return points;}
-    void setCh(QPolygon &ch_){ch = ch_;}
-    void setEr(QPolygon &er_){er = er_;}
-
+    std::vector<QPolygon> getPolygons(){return polygons;}
+    void addCh(QPolygon &ch_){chs.push_back(ch_);}
+    void addEr(QPolygon &er_){ers.push_back(er_);}
+    void clearChs(){chs.clear();}
+    void clearErs(){ers.clear();}
+    void drawPolygons(std::vector<QPolygon> &pols);
 
 signals:
 

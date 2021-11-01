@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QtGui>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -19,6 +20,12 @@ private slots:
     void on_pushButton_2_clicked();
 
     void on_pushButton_clicked();
+
+    void on_pushButton_load_clicked();
+
+    void on_pushButton_clear_data_clicked();
+
+    void processPoints(std::vector <QPoint> &points);
 
 private:
     Ui::Widget *ui;

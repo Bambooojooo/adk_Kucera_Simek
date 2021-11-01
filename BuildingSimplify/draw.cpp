@@ -1,5 +1,8 @@
 #include "draw.h"
 
+#include <iostream>
+#include <QtGui>
+
 Draw::Draw(QWidget *parent) : QWidget(parent)
 {
 
@@ -7,34 +10,47 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
 
 void Draw::paintEvent(QPaintEvent *event)
 {
-    QPainter qp(this);
-    qp.begin(this);
+	QPainter qp(this);
+	qp.begin(this);
 
-    //Draw points
-    int r=4;
-    QPolygon pol;
+	//Draw points
+	int r=4;
+	QPolygon pol;
 
-    for (int i=0; i<points.size(); i++)
-    {
-        qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
-        pol.append(points[i]);
-    }
+	//Draw loaded polygons
+	for (QPolygon polygon : Draw::polygons)
+	{
+		qp.setBrush(Qt::cyan);
+		qp.drawPolygon(polygon);
+	}
 
-    //Draw polygon
-    qp.setBrush(Qt::yellow);
-    qp.drawPolygon(pol);
+	//Draw points
+	qp.setBrush(Qt::NoBrush);
+	for (int i=0; i<points.size(); i++)
+	{
+		qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
+		pol.append(points[i]);
+	}
 
-    //Draw convex hull
-    qp.setBrush(Qt::NoBrush);
-    qp.setPen(Qt::red);
-    qp.drawPolygon(ch);
+	//Draw polygon
+	qp.setBrush(Qt::yellow);
+	qp.drawPolygon(pol);
 
-    //Draw enclosing rectangle
-    qp.setBrush(Qt::NoBrush);
-    qp.setPen(Qt::green);
-    qp.drawPolygon(er);
+	//Draw convex hull
+	qp.setBrush(Qt::NoBrush);
+	qp.setPen(Qt::red);
+	if (chs.size() > 0)
+		for (QPolygon chull : chs)
+			qp.drawPolygon(chull);
 
-    qp.end();
+	//Draw enclosing rectangle
+	qp.setBrush(Qt::NoBrush);
+	qp.setPen(Qt::green);
+	if (ers.size() > 0)
+		for (QPolygon enrect : ers)
+			qp.drawPolygon(enrect);
+
+	qp.end();
 }
 
 void Draw::mousePressEvent(QMouseEvent *event)
@@ -51,13 +67,32 @@ void Draw::mousePressEvent(QMouseEvent *event)
 
     //Update screen
     repaint();
+
 }
 
-void Draw::clear()
+void Draw::clearDrawing()
 {
     points.clear();
-    ch.clear();
-    er.clear();
+    chs.clear();
+    ers.clear();
 
     repaint();
+}
+
+void Draw::clearData()
+{
+    polygons.clear();
+    chs.clear();
+    ers.clear();
+
+    repaint();
+}
+void Draw::drawPolygons(std::vector<QPolygon> &pols)
+{
+	//Draw vector of polygons by simply pushing back to a polygons vector (private variable)
+	Draw::polygons.clear();
+	for (QPolygon pol : pols)
+		Draw::polygons.push_back(pol);
+
+	repaint();
 }

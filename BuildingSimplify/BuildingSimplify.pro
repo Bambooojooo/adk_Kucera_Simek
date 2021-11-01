@@ -17,6 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     algorithms.cpp \
+    csv.cpp \
     draw.cpp \
     main.cpp \
     sortbyx.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 
 HEADERS += \
     algorithms.h \
+    csv.h \
     draw.h \
     sortbyx.h \
     sortbyy.h \

@@ -155,27 +155,24 @@ QPolygon Algorithms::minAreaEnclosingRectangle(std::vector <QPoint> &points)
          auto [mmb, area] = minMaxBox(r_points);
 
          //Update minimum
-         if (area < area_min)
+	 if (area <= area_min)
          {
              area_min = area;
              sigma_min = sigma;
              mmb_min = mmb;
          }
      }
-
     //Create enclosing rectangle
     std::vector<QPoint> er = rotate(mmb_min, sigma_min);
 
     //Resize rectangle, preserve area of the building
     std::vector<QPoint> err = resizeRectangle(points,er);
-
     //Create QPolygon
     QPolygon er_pol;
     er_pol.append(err[0]);
     er_pol.append(err[1]);
     er_pol.append(err[2]);
     er_pol.append(err[3]);
-
     return er_pol;
 }
 
@@ -267,15 +264,21 @@ std::vector <QPoint> Algorithms::resizeRectangle(std::vector <QPoint> &points, s
         //Building area
         double AB = LH(points);
 
+	if (AB == 0)
+		AB = 1;
+
         //Rectangle area
         double AR = LH(er);
 
-        //Fraction of areas
-        double k = AB/AR;
+	//Fraction of areas
+	if (AR == 0)
+		AR = 1;
+
+	double k = AB/AR;
 
         //Center of mass
-        double xc = (er[0].x() + er[1].x() + er[2].x() + er[3].x())/4;
-        double yc = (er[0].y() + er[1].y() + er[2].y() + er[3].y())/4;
+	double xc = (er[0].x() + er[1].x() + er[2].x() + er[3].x())/4;
+	double yc = (er[0].y() + er[1].y() + er[2].y() + er[3].y())/4;
 
         //Compute vector components
         double u1x = er[0].x() - xc;
