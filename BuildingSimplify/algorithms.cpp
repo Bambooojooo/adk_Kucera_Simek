@@ -418,3 +418,106 @@ QPolygon Algorithms::longestEdge(std::vector <QPoint> &points)
 
 	return er_pol;
 }
+
+int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
+{
+    //Analyze point and line position
+    double eps = 1.0e-10;
+
+    //Coordinate differences
+    double ux=p2.x()-p1.x();
+    double uy=p2.y()-p1.y();
+
+    double vx=a.x()-p1.x();
+    double vy=a.y()-p1.y();
+
+    //Half plane test(cross product)
+    double t = ux*vy-vx*uy;
+
+    //Point in the left halfplane
+    if (t > eps)
+        return 1;
+
+    //Point in the right halfplane
+    if (t < -eps)
+        return 0;
+
+    //Point on the line
+    return -1;
+}
+
+QPolygon Algorithms::cHullGraham(std::vector <QPoint> &points)
+{
+    //Create convex hull, Graham scan
+
+    //Numeric precision for comparision of angles
+    double eps = 1e-9;
+    //Convex hull
+    QPolygon ch;
+
+    //Find pivot
+    QPoint q=*std::min_element(points.begin(), points.end(), sortByY());
+
+    //Add pivot to the convex hull
+    ch.append(q);
+
+    //x point is on X axis
+    QPoint x(q.x() -100, q.y());
+
+    //Create vector of pairs - sigma/index
+    std::vector<std::pair<double, int>> angle_index;
+
+    //Compute sigma - angle measured from the x parallel
+    for (int i =0; i < points.size(); i++)
+    {
+        double sigma = get2LinesAngle(q, x, q, points[i]);
+
+        //Insert pairs into vector
+        if (std::isnan(sigma))
+            angle_index.push_back(std::make_pair(0, i));
+        else
+            angle_index.push_back(std::make_pair(sigma, i));
+    }
+
+    //Sort points by sigma
+    std::sort(angle_index.begin(), angle_index.end());
+
+    //Delete closer points with the same angle
+    for (int i = 0; i < angle_index.size()-1; i++)
+    {
+        if (fabs(angle_index[i].first - angle_index[i+1].first) < eps)
+        {
+            double l1 = distance(points[angle_index[i].second], q);
+            double l2 = distance(points[angle_index[i+1].second], q);
+
+            if (l1 < l2)
+                points.erase(points.begin() + angle_index[i].second);
+            else
+                points.erase(points.begin() + angle_index[i+1].second);
+        }
+
+    }
+
+    //Add point with smallest sigma into the convex hull
+    ch.append(points[angle_index[1].second]);
+
+    //Create the convex hull
+    for (int j =2; j < angle_index.size(); j++)
+    {
+        while (getPointLinePosition(points[angle_index[j].second],ch[ch.size() -1],ch[ch.size() -2]) != 1)
+            ch.pop_back();
+        ch.push_back(points[angle_index[j].second]);
+    }
+
+    return ch;
+}
+
+double Algorithms::distance(QPoint p1, QPoint p2)
+{
+    //Compute 2D distance of 2 inserted points
+    double dx = p1.x() - p2.x();
+    double dy = p1.y() - p2.y();
+
+    return std::sqrt(dx*dx + dy*dy);
+}
+

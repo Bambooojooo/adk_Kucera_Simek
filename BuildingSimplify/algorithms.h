@@ -18,6 +18,9 @@ public:
     QPolygon wallAverage(std::vector <QPoint> &points);
     QPolygon weightedBisector(std::vector <QPoint> &points);
     QPolygon longestEdge(std::vector <QPoint> &points);
+    int getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2);
+    QPolygon cHullGraham(std::vector <QPoint> &points);
+    double distance(QPoint p1, QPoint p2);
 };
 
 #endif // ALGORITHMS_H
