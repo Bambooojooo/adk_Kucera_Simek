@@ -27,6 +27,14 @@ private slots:
 
     void processPoints(std::vector <QPoint> &points);
 
+    void createHulls(std::vector <QPoint> &points);
+
+    void on_pushButton_3_clicked();
+
+    void on_pushButton_CreateHull_clicked();
+
+    void on_pushButton_createHulls_clicked();
+
 private:
     Ui::Widget *ui;
 };

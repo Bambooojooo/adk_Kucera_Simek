@@ -103,7 +103,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 		//Store the pair of coordinates and reset pair iterator
 		if (pairIterator == 2)
 		{
-			std::cout << "x: " << x << ", y: " << y << std::endl;
 			QPoint p(x,y);
 			polygon << p;
 			pairIterator = 0;
@@ -112,7 +111,6 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 	    colId++;
 	}
 	//Store the object of a line
-//	std:: cout << polygon.size() << std::endl;
 	result.push_back(polygon);
     }
 

@@ -91,6 +91,27 @@
       </widget>
      </item>
      <item>
+      <widget class="QComboBox" name="comboBox_HullsMethods">
+       <item>
+        <property name="text">
+         <string>Jarvis Scan</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Graham Scan</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_createHulls">
+       <property name="text">
+        <string>Create convex hulls</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

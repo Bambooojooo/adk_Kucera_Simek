@@ -78,15 +78,12 @@ void Widget::on_pushButton_clicked()
 
     //Create enclosing rectangle
     Algorithms a;
-    QPolygon er;
     std::vector<QPoint> polygon_points;
 
-    std::cout << "points size: " << points.size() << std::endl;
     //Process drawn points
     if (points.size() > 1)
 	processPoints(points);
 
-    std::cout << "polygons size: " << polygons.size() << std::endl;
     //Process loaded data
     if (polygons.size() > 0)
 	    for (QPolygon polygon : polygons)
@@ -118,6 +115,61 @@ void Widget::on_pushButton_load_clicked()
 	ui->Canvas->drawPolygons(polygon_vector);
 }
 
+void Widget::createHulls(std::vector <QPoint> &points)
+{
+	//Create enclosing rectangle
+	Algorithms a;
+	QPolygon ch;
+	std::cout << "3" << std::endl;
 
+	if (ui->comboBox_HullsMethods->currentText() == "Jarvis Scan")
+	{
+	    //Jarvis Scan
+	    std::cout << "2" << std::endl;
+	    ch = a.cHull(points);
+	}
 
+	else if (ui->comboBox_HullsMethods->currentText() == "Graham Scan")
+	{
+	    //Graham Scan
+	    ch = a.cHullGraham(points);
+	    std::cout << "1" << std::endl;
+	}
+
+	//Update enclosing rectangle
+	ui->Canvas->addCh(ch);
+
+	//Repaint
+	repaint();
+}
+
+void Widget::on_pushButton_createHulls_clicked()
+{
+	//Get points
+	std::vector<QPoint> points = ui->Canvas->getPoints();
+	std::vector<QPolygon> polygons = ui->Canvas->getPolygons();
+
+	std::cout << "clicked" << std::endl;
+
+	//Create enclosing rectangle
+	Algorithms a;
+	std::vector<QPoint> polygon_points;
+
+	//Process drawn points
+	if (points.size() > 1)
+	    createHulls(points);
+
+	//Process loaded data
+	if (polygons.size() > 0)
+		for (QPolygon polygon : polygons)
+		{
+			polygon_points.clear();
+			for (QPoint point : polygon)
+				polygon_points.push_back(point);
+
+			if (polygon_points.size() > 0)
+			    createHulls(polygon_points);
+		}
+	ui->Canvas->clearChs();
+}
 
