@@ -85,16 +85,16 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 				if (pairIterator == 0)
 				{
 					//Convert string value to integer value
-					x = (std::stod(coordinate)-668000)/2;
-//					x = (std::stod(coordinate));
+//					x = (std::stod(coordinate)-668000)/2;
+					x = (std::stod(coordinate));
 					pairIterator++;
 				}
 				//If there is y coor to read
 				else if (pairIterator == 1)
 				{
 					//Convert string value to integer value
-					y = (std::stod(coordinate)-1130000)/2 +200;
-//					y = (std::stod(coordinate));
+//					y = (std::stod(coordinate)-1130000)/2 +200;
+					y = (std::stod(coordinate));
 					pairIterator++;
 				}
 			}
