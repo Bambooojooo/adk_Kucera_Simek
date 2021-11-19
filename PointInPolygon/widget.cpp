@@ -40,8 +40,16 @@ void Widget::on_pushButtonAnalyze_clicked()
   //Analyze position of the point and vertex
     QPoint q = ui->Canvas->getPoint();
     QString Alg = ui->comboBox->currentText();
+    QPolygon pol;
     std::vector<int> results;
-    std::vector<QPoint> pol = ui->Canvas->getVertices();
+    std::vector<QPoint> vertices = ui->Canvas->getVertices();
+
+    //Make polygon from vertices and add them to pols for processing
+    for (QPoint vertice : vertices)
+	pol << vertice;
+    //pols.push_back(pol);
+
+    ui->Canvas->pushPolygon(pol);
     std::vector<QPolygon> pols = ui->Canvas->getPolygons();
 
     //Get position
@@ -50,6 +58,7 @@ void Widget::on_pushButtonAnalyze_clicked()
 
     //Iterate trough all polygons to analyze position of the point and return position. Also fill results vector with position of the point to every single polygon
     pos = a.processPolygons(q, pols, Alg, results);
+    std::cout << "pos: " << pos << std::endl;
 
     //Store position of the point to every single polygon
     ui->Canvas->addResults(results);
@@ -82,13 +91,7 @@ void Widget::on_pushButtonLoad_clicked()
 	//Read the file with chosen path
 	std::vector<QPolygon> polygonVector = csvObject.read_csv(filename);
 
-	//Polygon status changes add_polygon bool to true, cause we are painting polygons right now
-	ui->Canvas->polygonStatus();
-
 	//Draw polygons
 	ui->Canvas->drawPolygons(polygonVector);
-
-	//Change add_polygon back to false
-	ui->Canvas->polygonStatus();
 }
 

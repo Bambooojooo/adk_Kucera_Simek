@@ -14,7 +14,7 @@ bool Algorithms::ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol)
 {
 	// Decide whether the point q is close to any polygon point
 	int n = pol.size();
-	double eps = 4.1;
+	double eps = 3.3;
 	double dist;
 
 	//Process all segments of polygon
@@ -35,8 +35,8 @@ bool Algorithms::ifCloseToPoint (QPoint &q, std::vector<QPoint> &pol)
 int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
 {
     //Analyze point and line position
-    double eps = 1.0e-11;
-//    double eps = 8;
+//    double eps = 1.0e-11;
+    double eps = 4;
 
     //Coordinate differences
     double ux=p2.x()-p1.x();
@@ -47,14 +47,22 @@ int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
 
     //Half plane test(cross product)
     double t = ux*vy-vx*uy;
+//    std::cout << "t: " << t << std::endl;
+
+    //Line length
+    double s = sqrt(ux*ux + uy*uy);
+    //std::cout << "s: " << s << std::endl;
+
+    //Normalized half plane test
+    double tn = t/s;
+    std::cout << "t/s: " << t/s << std::endl;
 
     //Point in the left halfplane
-    if (t > eps)
+    if (tn > eps)
         return 1;
-    std::cout << "t: " << t << std::endl;
 
     //Point in the right halfplane
-    if (t < -eps)
+    if (tn < -eps)
         return 0;
 
     //Point on the line
@@ -89,7 +97,7 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
     //Analyze position of point and polygon
     int n = pol.size();
     double omega_sum=0;
-    double eps_border = M_PI/36;
+//    double eps_border = M_PI/36;
 
     //Process all segments of polygon
     for (int i = 0; i<n; i++)
@@ -104,8 +112,45 @@ int Algorithms::getPositionWinding(QPoint &q, std::vector<QPoint> &pol)
         // Point and line segment position
         int pos = getPointLinePosition(q, pol[i], pol[(i+1)%n]);
 
+	//Point on the line
 	if (pos == -1)
-		return -1;
+	{
+		//Coors if bbox
+		double x_min = 0;
+		double x_max = 0;
+		double y_min = 0;
+		double y_max = 0;
+
+		//Difference tolerance
+		double eps = 8;
+
+		//Make bbox
+		if (pol[i].x() <= pol[(i+1)%n].x())
+		{
+		    x_min = pol[i].x();
+		    x_max = pol[(i+1)%n].x();
+		}
+		else
+		{
+		    x_min = pol[(i+1)%n].x();
+		    x_max = pol[i].x();
+		}
+
+		if (pol[i].y() <= pol[(i+1)%n].y())
+		{
+		    y_min = pol[i].y();
+		    y_max = pol[(i+1)%n].y();
+		}
+		else
+		{
+		    y_min = pol[(i+1)%n].y();
+		    y_max = pol[i].y();
+		}
+
+		//Point on the line
+		if ((q.x() >= (x_min-eps)) && (q.x() <= (x_max+eps)) && (q.y() >= (y_min-eps)) && (q.y() <= (y_max+eps)))
+			return -1;
+	}
 
         //Point in the left halfplane
         if (pos==1)
@@ -197,7 +242,6 @@ int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString 
 	std::vector<QPoint> points;
 	int pos;
 	int result = 0;
-	int o = 0;
 	std::vector<int> positions;
 
 	//Iterate through each polygon to analyze position of a point
@@ -227,8 +271,6 @@ int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString 
 			{
 				pos = this->getPositionWinding(q, points);
 				results.push_back(pos);
-				std::cout << points.size() << std::endl;
-				o++;
 			}
 			//Ray crossing algorithm
 			else if (Alg == "Ray crossing")
@@ -240,7 +282,6 @@ int Algorithms::processPolygons(QPoint &q, std::vector<QPolygon> &pols, QString 
 
 		//Store position of a point compared to each polygon
 		positions.push_back(pos);
-		std::cout << "o: " << o << std::endl;
 	}
 
 	//Determine whether the point is on the vertex, on the line, inside or outside of polygons

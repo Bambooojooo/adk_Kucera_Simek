@@ -8,7 +8,6 @@ Draw::Draw(QWidget *parent) : QWidget(parent)
     q.setX(-100);
     q.setY(-100);
     add_vertex = true;
-    add_polygons = false;
 }
 
 void Draw::paintEvent(QPaintEvent *event)
@@ -28,15 +27,10 @@ void Draw::paintEvent(QPaintEvent *event)
     //Create new polygon
     QPolygon pol;
 
-    //If clicking on the canvas, add_polygons is false and then single vertices from clicking are appended to pol which will be created.
-    if (not add_polygons)
-    {
-	    for (int i = 0; i < vertices.size(); i++)
-	    {
-		pol.append(vertices[i]);
-	    }
-	    polygons.push_back(pol);
-    }
+    //Draw vertices
+    for (QPoint vertice : vertices)
+	pol << vertice;
+    painter.drawPolygon(pol);
 
     //Highlight polygons
     for(int i = 0; i<polygonResults.size(); i++)
@@ -116,4 +110,3 @@ void Draw::addResults(std::vector<int> &results)
 	for (int result : results)
 		polygonResults.push_back(result);
 }
-
