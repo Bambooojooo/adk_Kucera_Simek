@@ -1,5 +1,6 @@
 #include "algorithms.h"
 #include "sortbyx.h"
+
 #include <list>
 
 Algorithms::Algorithms()
@@ -7,7 +8,7 @@ Algorithms::Algorithms()
 
 }
 
-int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
+int Algorithms::getPointLinePosition(QPoint3D &a,QPoint3D &p1,QPoint3D &p2)
 {
     //Analyze point and line position
     double eps = 1.0e-10;
@@ -34,7 +35,7 @@ int Algorithms::getPointLinePosition(QPoint &a,QPoint &p1,QPoint &p2)
     return -1;
 }
 
-std::tuple<QPoint,double>Algorithms::getCircleCenterAndRadius(QPoint &p1,QPoint &p2,QPoint &p3)
+std::tuple<QPoint3D,double>Algorithms::getCircleCenterAndRadius(QPoint3D &p1,QPoint3D &p2,QPoint3D &p3)
 {
     //Return center and radius of inscribed circle
     double k1 = p1.x() * p1.x() + p1.y() * p1.y();
@@ -56,12 +57,12 @@ std::tuple<QPoint,double>Algorithms::getCircleCenterAndRadius(QPoint &p1,QPoint 
     double r = sqrt((p1.x() - m) * (p1.x() - m) + (p1.y() - n) * (p1.y() - n));
 
     //Create center
-    QPoint c(m,n);
+    QPoint3D c(m,n);
 
     return {c,r};
 }
 
-int Algorithms::getDelaunayPoint(QPoint &s,QPoint &e,std::vector<QPoint> &points)
+int Algorithms::getDelaunayPoint(QPoint3D &s,QPoint3D &e,std::vector<QPoint3D> &points)
 {
     //Find and return Delaunay point
     int min_index = -1;
@@ -95,7 +96,7 @@ int Algorithms::getDelaunayPoint(QPoint &s,QPoint &e,std::vector<QPoint> &points
     return min_index;
 }
 
-int Algorithms::getNearestPoint(QPoint &p, std::vector<QPoint> &points)
+int Algorithms::getNearestPoint(QPoint3D &p, std::vector<QPoint3D> &points)
 {
     //Find nearest point
     double min_dist = 1.e16;
@@ -120,18 +121,18 @@ int Algorithms::getNearestPoint(QPoint &p, std::vector<QPoint> &points)
     return min_ind;
 }
 
-std::vector<Edge> Algorithms::dT(std::vector<QPoint> &points)
+std::vector<Edge> Algorithms::dT(std::vector<QPoint3D> &points)
 {
     //Create Delaunay triangulation using incremental method
     std::vector<Edge> dt;
     std::list<Edge> ael;
 
     //Find pivot (minimum x)
-    QPoint q = *min_element(points.begin(), points.end(), sortByX());
+    QPoint3D q = *min_element(points.begin(), points.end(), sortByX());
 
     //Point nearest to pivot q
     int i_nearest = getNearestPoint(q, points);
-    QPoint qn = points[i_nearest];
+    QPoint3D qn = points[i_nearest];
 
     //Create new edge
     Edge e(q, qn);
@@ -147,11 +148,11 @@ std::vector<Edge> Algorithms::dT(std::vector<QPoint> &points)
     }
 
     //Delaunay point + 3rd vertex
-    QPoint v3 = points[i_point];
+    QPoint3D v3 = points[i_point];
 
     //Create edges
-    QPoint es = e.getStart();
-    QPoint ee = e.getEnd();
+    QPoint3D es = e.getStart();
+    QPoint3D ee = e.getEnd();
     Edge e2(ee, v3);
     Edge e3(v3, es);
 
@@ -176,8 +177,8 @@ std::vector<Edge> Algorithms::dT(std::vector<QPoint> &points)
         e.changeOrientation();
 
         //Find optimal Delaunay point
-        QPoint qs = e.getStart();
-        QPoint qe = e.getEnd();
+	QPoint3D qs = e.getStart();
+	QPoint3D qe = e.getEnd();
         i_point = getDelaunayPoint(qs, qe, points);
 
         //Point has been found
@@ -227,3 +228,124 @@ void Algorithms::updateAEL(Edge &e, std::list<Edge> &ael)
     else
         ael.erase(ie);
 }
+
+QPoint3D Algorithms::getCountourPoint(QPoint3D &p1, QPoint3D &p2, double z)
+{
+	//Get intersecting countour point of a triangle and horizontal plane
+	double xb = (p2.x()-p1.x())/(p2.getZ()-p1.getZ())*(z-p1.getZ()) + p1.x();
+	double yb = (p2.y()-p1.y())/(p2.getZ()-p1.getZ())*(z-p1.getZ()) + p1.y();
+}
+
+std::vector<Edge> Algorithms::getCountourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz)
+{
+	//Create countour lines from delaunay triangulation
+	std::vector<Edge> contours;
+
+	//Process all triangles of DT
+	for(int i=0; i<dt.size(); i+=3)
+	{
+		//Get triangle vertices
+		QPoint3D p1 = dt[i].getStart();
+		QPoint3D p2 = dt[i].getEnd();
+		QPoint3D p3 = dt[i+1].getEnd();
+
+		//Get vertices heights
+		double z1 = p1.getZ();
+		double z2 = p2.getZ();
+		double z3 = p3.getZ();
+
+		//Check all horizontal planes
+		for(double z = zmin; z <= zmax; z+=dz)
+		{
+			//Height differences
+			double dz1 = z1 - z;
+			double dz2 = z2 - z;
+			double dz3 = z3 - z;
+
+			//Edge intersected by plane?
+			double dz12 = dz1*dz2;
+			double dz23 = dz2*dz3;
+			double dz31 = dz3*dz1;
+
+			//Triangle is complanar
+			if ((dz1 == 0) && (dz2 == 0) && (dz3 == 0))
+				continue;
+
+			//Edge (p1, p2) is collinear
+			else if  ((dz1 == 0) && (dz2 == 0))
+				contours.push_back(dt[i]);
+
+			//Edge (p2, p3) is collinear
+			else if  ((dz2 == 0) && (dz3 == 0))
+				contours.push_back(dt[i+2]);
+
+			//Edge (p3, p1) is collinear
+			else if  ((dz3 == 0) && (dz1 == 0))
+				contours.push_back(dt[i+3]);
+
+			//Plane intersects edges (p1, p2) and (p2, p3)
+			else if (((dz12 <= 0 ) && (dz23 < 0 )) || ((dz12 < 0 ) && (dz23 <= 0 )))
+			{
+				//Compute intersections
+				QPoint3D A = getCountourPoint(p1, p2, z);
+				QPoint3D B = getCountourPoint(p2, p3, z);
+
+				//Add edge to contour list
+				contours.push_back(Edge(A, B));
+			}
+
+			//Plane intersects edges (p2, p3) and (p3, p1)
+			else if (((dz23 <= 0 ) && (dz31 < 0 )) || ((dz23 < 0 ) && (dz31 <= 0 )))
+			{
+				//Compute intersections
+				QPoint3D A = getCountourPoint(p2, p3, z);
+				QPoint3D B = getCountourPoint(p3, p1, z);
+
+				//Add edge to contour list
+				contours.push_back(Edge(A, B));
+			}
+
+			//Plane intersects edges (p3, p1) and (p1, p2)
+			else if (((dz31 <= 0 ) && (dz12 < 0 )) || ((dz31 < 0 ) && (dz12 <= 0 )))
+			{
+				//Compute intersections
+				QPoint3D A = getCountourPoint(p3, p1, z);
+				QPoint3D B = getCountourPoint(p1, p2, z);
+
+				//Add edge to contour list
+				contours.push_back(Edge(A, B));
+			}
+
+		}
+	}
+	return contours;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

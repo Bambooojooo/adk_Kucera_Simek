@@ -24,8 +24,8 @@ void Draw::paintEvent(QPaintEvent *event)
     for(Edge e : dt)
     {
         //Get start point, get end point
-        QPoint s_point = e.getStart();
-        QPoint e_point = e.getEnd();
+	QPoint3D s_point = e.getStart();
+	QPoint3D e_point = e.getEnd();
 
         //Draw line
         qp.drawLine(s_point,e_point);
@@ -41,7 +41,7 @@ void Draw::mousePressEvent(QMouseEvent *event)
     int y = event->pos().y();
 
     //Create point
-    QPoint p(x,y);
+    QPoint3D p(x,y);
 
     //Add point to the vector
     points.push_back(p);

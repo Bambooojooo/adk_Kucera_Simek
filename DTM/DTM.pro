@@ -20,6 +20,7 @@ SOURCES += \
     draw.cpp \
     edge.cpp \
     main.cpp \
+    qpoint3d.cpp \
     sortbyx.cpp \
     widget.cpp
 
@@ -27,6 +28,7 @@ HEADERS += \
     algorithms.h \
     draw.h \
     edge.h \
+    qpoint3d.h \
     sortbyx.h \
     widget.h
 

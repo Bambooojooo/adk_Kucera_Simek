@@ -8,6 +8,13 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    zmin = 100.0;
+    zmax = 1000.0;
+    dz = 5.0;
+
+    ui->lineEdit->setText(QString::number(zmin));
+    ui->lineEdit_2->setText(QString::number(zmax));
+    ui->lineEdit_3->setText(QString::number(dz));
 }
 
 
@@ -27,7 +34,7 @@ void Widget::on_pushButton_2_clicked()
 void Widget::on_pushButton_clicked()
 {
     //Get points
-    std::vector<QPoint> points = ui->Canvas->getPoints();
+    std::vector<QPoint3D> points = ui->Canvas->getPoints();
 
     //Create DT
     Algorithms a;
@@ -46,3 +53,21 @@ void Widget::on_pushButton_cleardt_clicked()
     ui->Canvas->clearDT();
     repaint();
 }
+
+void Widget::on_lineEdit_editingFinished()
+{
+	zmin = ui->lineEdit->text().toDouble();
+}
+
+
+void Widget::on_lineEdit_2_editingFinished()
+{
+	zmax = ui->lineEdit_2->text().toDouble();
+}
+
+
+void Widget::on_lineEdit_3_editingFinished()
+{
+	dz = ui->lineEdit_3->text().toDouble();
+}
+

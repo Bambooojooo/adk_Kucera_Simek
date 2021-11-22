@@ -5,13 +5,14 @@
 
 #include <QtGui>
 #include "edge.h"
+#include "qpoint3d.h"
 
 
 class Draw : public QWidget
 {
     Q_OBJECT
 private:
-    std::vector<QPoint> points;
+    std::vector<QPoint3D> points;
     std::vector<Edge> dt;
 
 public:
@@ -19,7 +20,7 @@ public:
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void clear();
-    std::vector<QPoint> getPoints(){return points;}
+    std::vector<QPoint3D> getPoints(){return points;}
     void setDT(std::vector<Edge> &dt_){dt = dt_;}
     void clearDT();
 
