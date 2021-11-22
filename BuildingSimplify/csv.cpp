@@ -14,7 +14,7 @@ CSV::CSV()
 
 }
 
-std::vector<QPolygon> CSV::read_csv(std::string &filename)
+std::vector<QPolygon> CSV::read_csv(std::string &filename, double &x_min, double &x_max, double &y_min, double &y_max)
 {
     // Reads a CSV file into a vector of QPolygons
 
@@ -87,6 +87,14 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 					//Convert string value to integer value
 //					x = (std::stod(coordinate)-668000)/2;
 					x = (std::stod(coordinate));
+
+					//Update minmax box coors
+					if (x < x_min)
+						x_min = x;
+
+					if (x > x_max)
+						x_max = x;
+
 					pairIterator++;
 				}
 				//If there is y coor to read
@@ -95,6 +103,14 @@ std::vector<QPolygon> CSV::read_csv(std::string &filename)
 					//Convert string value to integer value
 //					y = (std::stod(coordinate)-1130000)/2 +200;
 					y = (std::stod(coordinate));
+
+					//Update minmax box coors
+					if (y < y_min)
+						y_min = y;
+
+					if (y > y_max)
+						y_max = y;
+
 					pairIterator++;
 				}
 			}

@@ -1,6 +1,9 @@
 #include "draw.h"
+#include "ui_widget.h"
+#include "widget.h"
 
 #include <iostream>
+#include <QFileDialog>
 #include <QtGui>
 
 Draw::Draw(QWidget *parent) : QWidget(parent)
@@ -95,4 +98,43 @@ void Draw::drawPolygons(std::vector<QPolygon> &pols)
 		Draw::polygons.push_back(pol);
 
 	repaint();
+}
+
+void Draw::drawPolygons(std::vector<QPolygon> &pols, double &x_trans, double &y_trans, double &x_ratio, double &y_ratio)
+{
+	//Draw vector of polygons by simply pushing back to a polygons vector (private variable)
+	QPolygon transformedPolygon;
+
+	Draw::polygons.clear();
+	for (QPolygon pol : pols)
+	{
+		transformedPolygon = transformPolygon(pol, x_trans, y_trans, x_ratio, y_ratio);
+		Draw::polygons.push_back(transformedPolygon);
+	}
+
+	repaint();
+}
+
+QPolygon Draw::transformPolygon(QPolygon &pol, double &x_trans, double &y_trans, double &x_ratio, double &y_ratio)
+{
+	//Transform polygon coorinates by basic transformation based on minmax box of dataset
+	//x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
+	QPolygon polygonTransformed;
+
+	for (QPoint p : pol)
+	{
+		//Translation with slight offset
+		double dx = p.x()-x_trans;
+		double dy = p.y()-y_trans;
+
+		//Scale
+		double x0 = dx/x_ratio;
+		double y0 = dy/y_ratio;
+
+		QPoint point(x0, y0);
+		polygonTransformed << point;
+	}
+
+	//Compute transformation key
+	return polygonTransformed;
 }

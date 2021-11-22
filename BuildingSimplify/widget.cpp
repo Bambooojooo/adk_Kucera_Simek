@@ -102,6 +102,12 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_pushButton_load_clicked()
 {
+	//Minmax box coors
+	double x_min =  10.e10;
+	double x_max = -10.e10;
+	double y_min =  10.e10;
+	double y_max = -10.e10;
+
 	//Open dialog to choose data file and store its path to QString
 	QString path(QFileDialog::getOpenFileName(this, tr("Open file with polygons"), "../", tr("CSV Files (*.csv)")));
 
@@ -109,10 +115,31 @@ void Widget::on_pushButton_load_clicked()
 	std::string filename = path.toStdString();
 
 	//Read the file with chosen path
-	std::vector<QPolygon> polygon_vector = CSV::read_csv(filename);
+	std::vector<QPolygon> polygon_vector = CSV::read_csv(filename, x_min, x_max, y_min, y_max);
+
+	//Get canvas size
+	int canvas_width = ui->Canvas->size().width();
+	int canvas_height = ui->Canvas->size().height();
+
+	//Get size ratio for transformation to canvas
+	double dataset_width = x_max - x_min;
+	double dataset_height = y_max - y_min;
+
+	//Get size ratio for transformation to canvas
+	double x_ratio = dataset_width/canvas_width;
+	double y_ratio = dataset_height/canvas_height;
+
+	//Get canvas left top corner coors
+	int x_left_top = ui->Canvas->geometry().x();
+	int y_left_top = ui->Canvas->geometry().y();
+
+	//Get translation parameter for transformation
+	double x_trans = x_min - x_left_top;
+	double y_trans = y_min - y_left_top;
 
 	//Draw polygons
-	ui->Canvas->drawPolygons(polygon_vector);
+	ui->Canvas->drawPolygons(polygon_vector, x_trans, y_trans, x_ratio, y_ratio);
+
 }
 
 void Widget::createHulls(std::vector <QPoint> &points)
@@ -120,12 +147,10 @@ void Widget::createHulls(std::vector <QPoint> &points)
 	//Create enclosing rectangle
 	Algorithms a;
 	QPolygon ch;
-	std::cout << "3" << std::endl;
 
 	if (ui->comboBox_HullsMethods->currentText() == "Jarvis Scan")
 	{
 	    //Jarvis Scan
-	    std::cout << "2" << std::endl;
 	    ch = a.cHull(points);
 	}
 
@@ -133,7 +158,6 @@ void Widget::createHulls(std::vector <QPoint> &points)
 	{
 	    //Graham Scan
 	    ch = a.cHullGraham(points);
-	    std::cout << "1" << std::endl;
 	}
 
 	//Update enclosing rectangle
@@ -148,8 +172,6 @@ void Widget::on_pushButton_createHulls_clicked()
 	//Get points
 	std::vector<QPoint> points = ui->Canvas->getPoints();
 	std::vector<QPolygon> polygons = ui->Canvas->getPolygons();
-
-	std::cout << "clicked" << std::endl;
 
 	//Create enclosing rectangle
 	Algorithms a;

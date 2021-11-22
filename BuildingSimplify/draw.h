@@ -29,6 +29,9 @@ public:
     void clearChs(){chs.clear();}
     void clearErs(){ers.clear();}
     void drawPolygons(std::vector<QPolygon> &pols);
+    void drawPolygons(std::vector<QPolygon> &pols, double &x_trans, double &y_trans, double &x_ratio, double &y_ratio);
+    QPolygon transformPolygon(QPolygon &pol, double &x_trans, double &y_trans, double &x_ratio, double &y_ratio);
+
 
 signals:
 
