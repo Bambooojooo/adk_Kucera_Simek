@@ -2,10 +2,9 @@
 #define DRAW_H
 
 #include <QWidget>
-
+#include "qpoint3d.h"
 #include <QtGui>
 #include "edge.h"
-#include "qpoint3d.h"
 
 
 class Draw : public QWidget

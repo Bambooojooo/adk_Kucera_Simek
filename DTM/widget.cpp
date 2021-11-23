@@ -56,18 +56,20 @@ void Widget::on_pushButton_cleardt_clicked()
 
 void Widget::on_lineEdit_editingFinished()
 {
-	zmin = ui->lineEdit->text().toDouble();
+    zmin = ui->lineEdit->text().toDouble();
 }
-
 
 void Widget::on_lineEdit_2_editingFinished()
 {
-	zmax = ui->lineEdit_2->text().toDouble();
+    zmax = ui->lineEdit->text().toDouble();
 }
-
 
 void Widget::on_lineEdit_3_editingFinished()
 {
-	dz = ui->lineEdit_3->text().toDouble();
+    dz = ui->lineEdit->text().toDouble();
+}
+
+void Widget::on_pushButton_3_clicked()
+{
 }
 

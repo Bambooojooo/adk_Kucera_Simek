@@ -1,6 +1,5 @@
 #include "algorithms.h"
 #include "sortbyx.h"
-
 #include <list>
 
 Algorithms::Algorithms()
@@ -177,8 +176,8 @@ std::vector<Edge> Algorithms::dT(std::vector<QPoint3D> &points)
         e.changeOrientation();
 
         //Find optimal Delaunay point
-	QPoint3D qs = e.getStart();
-	QPoint3D qe = e.getEnd();
+        QPoint3D qs = e.getStart();
+        QPoint3D qe = e.getEnd();
         i_point = getDelaunayPoint(qs, qe, points);
 
         //Point has been found
@@ -229,123 +228,97 @@ void Algorithms::updateAEL(Edge &e, std::list<Edge> &ael)
         ael.erase(ie);
 }
 
-QPoint3D Algorithms::getCountourPoint(QPoint3D &p1, QPoint3D &p2, double z)
+QPoint3D Algorithms::getContourPoint(QPoint3D &p1, QPoint3D &p2, double z)
 {
-	//Get intersecting countour point of a triangle and horizontal plane
-	double xb = (p2.x()-p1.x())/(p2.getZ()-p1.getZ())*(z-p1.getZ()) + p1.x();
-	double yb = (p2.y()-p1.y())/(p2.getZ()-p1.getZ())*(z-p1.getZ()) + p1.y();
+    //Get countour point intersection of triangle and horizontal countour
+    double xb = (p2.x()-p1.x())/(p2.getZ()-p1.getZ())*(z-p1.getZ())+p1.x();
+    double yb = (p2.y()-p1.y())/(p2.getZ()-p1.getZ())*(z-p1.getZ())+p1.y();
 }
 
-std::vector<Edge> Algorithms::getCountourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz)
+std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz)
 {
-	//Create countour lines from delaunay triangulation
-	std::vector<Edge> contours;
+    //Get countour lines from delaunay triangulation
+    std::vector<Edge> contours;
 
-	//Process all triangles of DT
-	for(int i=0; i<dt.size(); i+=3)
-	{
-		//Get triangle vertices
-		QPoint3D p1 = dt[i].getStart();
-		QPoint3D p2 = dt[i].getEnd();
-		QPoint3D p3 = dt[i+1].getEnd();
+    //Process all triangles of dt
+    for (int i = 0; i < dt.size(); i+=3)
+    {
+        //Get triangle vertices
+        QPoint3D p1 = dt[i].getStart();
+        QPoint3D p2 = dt[i].getEnd();
+        QPoint3D p3 = dt[i+1].getEnd();
 
-		//Get vertices heights
-		double z1 = p1.getZ();
-		double z2 = p2.getZ();
-		double z3 = p3.getZ();
+        //Get height of points
+        double z1 = p1.getZ();
+        double z2 = p2.getZ();
+        double z3 = p3.getZ();
 
-		//Check all horizontal planes
-		for(double z = zmin; z <= zmax; z+=dz)
-		{
-			//Height differences
-			double dz1 = z1 - z;
-			double dz2 = z2 - z;
-			double dz3 = z3 - z;
+        //Check all horizontal planes
+        for (double z = zmin; z <= zmax; z+=dz)
+        {
+            //Height differences
+            double dz1 = z1 - z;
+            double dz2 = z2 - z;
+            double dz3 = z3 - z;
 
-			//Edge intersected by plane?
-			double dz12 = dz1*dz2;
-			double dz23 = dz2*dz3;
-			double dz31 = dz3*dz1;
+            //Edge intersected by plane?
+            double dz12 = dz1*dz2;
+            double dz23 = dz2*dz3;
+            double dz31 = dz3*dz1;
 
-			//Triangle is complanar
-			if ((dz1 == 0) && (dz2 == 0) && (dz3 == 0))
-				continue;
+            //Triangle is complanar
+            if ((dz1 == 0) && (dz2 == 0) && (dz3 == 0))
+                continue;
 
-			//Edge (p1, p2) is collinear
-			else if  ((dz1 == 0) && (dz2 == 0))
-				contours.push_back(dt[i]);
+            //Edge p1-p2 is collinear
+            else if ((dz1 == 0) && (dz2 == 0))
+                contours.push_back(dt[i]);
 
-			//Edge (p2, p3) is collinear
-			else if  ((dz2 == 0) && (dz3 == 0))
-				contours.push_back(dt[i+2]);
+            //Edge p2-p3 is collinear
+            else if ((dz2 == 0) && (dz3 == 0))
+                contours.push_back(dt[i+1]);
 
-			//Edge (p3, p1) is collinear
-			else if  ((dz3 == 0) && (dz1 == 0))
-				contours.push_back(dt[i+3]);
+            //Edge p3-p1 is collinear
+            else if ((dz3 == 0) && (dz1 == 0))
+                contours.push_back(dt[i+2]);
 
-			//Plane intersects edges (p1, p2) and (p2, p3)
-			else if (((dz12 <= 0 ) && (dz23 < 0 )) || ((dz12 < 0 ) && (dz23 <= 0 )))
-			{
-				//Compute intersections
-				QPoint3D A = getCountourPoint(p1, p2, z);
-				QPoint3D B = getCountourPoint(p2, p3, z);
+            //Plane intersects edges p1-p2 and p2-p3
+            else if (((dz12 <= 0) && (dz23 < 0)) || ((dz12 < 0) && (dz23 <= 0)))
+            {
+                //Compute intersections
+                QPoint3D A = getContourPoint(p1, p2, z);
+                QPoint3D B = getContourPoint(p2, p3, z);
 
-				//Add edge to contour list
-				contours.push_back(Edge(A, B));
-			}
+                //Create edge and add it to the list
+                Edge ab(A, B);
+                contours.push_back(ab);
+            }
 
-			//Plane intersects edges (p2, p3) and (p3, p1)
-			else if (((dz23 <= 0 ) && (dz31 < 0 )) || ((dz23 < 0 ) && (dz31 <= 0 )))
-			{
-				//Compute intersections
-				QPoint3D A = getCountourPoint(p2, p3, z);
-				QPoint3D B = getCountourPoint(p3, p1, z);
+            //Plane intersects edges p2-p3 and p3-p1
+            else if (((dz23 <= 0) && (dz31 < 0)) || ((dz23 < 0) && (dz31 <= 0)))
+            {
+                //Compute intersections
+                QPoint3D A = getContourPoint(p2, p3, z);
+                QPoint3D B = getContourPoint(p3, p1, z);
 
-				//Add edge to contour list
-				contours.push_back(Edge(A, B));
-			}
+                //Create edge and add it to the list
+                Edge ab(A, B);
+                contours.push_back(ab);
+            }
 
-			//Plane intersects edges (p3, p1) and (p1, p2)
-			else if (((dz31 <= 0 ) && (dz12 < 0 )) || ((dz31 < 0 ) && (dz12 <= 0 )))
-			{
-				//Compute intersections
-				QPoint3D A = getCountourPoint(p3, p1, z);
-				QPoint3D B = getCountourPoint(p1, p2, z);
+            //Plane intersects edges p3-p1 and p1-p2
+            else if (((dz31 <= 0) && (dz12 < 0)) || ((dz31 < 0) && (dz12 <= 0)))
+            {
+                //Compute intersections
+                QPoint3D A = getContourPoint(p3, p1, z);
+                QPoint3D B = getContourPoint(p1, p2, z);
 
-				//Add edge to contour list
-				contours.push_back(Edge(A, B));
-			}
+                //Create edge and add it to the list
+                Edge ab(A, B);
+                contours.push_back(ab);
+            }
+        }
+    }
 
-		}
-	}
-	return contours;
+    return contours;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

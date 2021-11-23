@@ -79,7 +79,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_3">
        <property name="text">
-        <string>PushButton</string>
+        <string>Create contours</string>
        </property>
       </widget>
      </item>

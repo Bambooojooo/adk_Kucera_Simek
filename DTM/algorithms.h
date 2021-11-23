@@ -17,8 +17,8 @@ public:
     int getNearestPoint(QPoint3D &p, std::vector<QPoint3D> &points);
     std::vector<Edge> dT(std::vector<QPoint3D> &points);
     void updateAEL(Edge &e, std::list<Edge> &ael);
-    QPoint3D getCountourPoint(QPoint3D &p1, QPoint3D &p2, double z);
-    std::vector<Edge> getCountourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz);
+    QPoint3D getContourPoint(QPoint3D &p1, QPoint3D &p2, double z);
+    std::vector<Edge> getContourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz);
 };
 
 #endif // ALGORITHMS_H

@@ -1,7 +1,7 @@
 #ifndef SORTBYX_H
 #define SORTBYX_H
 #include <QtGui>
-#include "QPoint3d.h"
+#include "qpoint3d.h"
 
 class sortByX
 {

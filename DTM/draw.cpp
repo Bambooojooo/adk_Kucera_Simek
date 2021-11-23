@@ -17,15 +17,15 @@ void Draw::paintEvent(QPaintEvent *event)
     for (int i=0; i<points.size(); i++)
     {
         qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
-        pol.append(points[i]);
+        pol.append(QPoint(points[i].x(), points[i].y()));
     }
 
     //Draw triangulation
     for(Edge e : dt)
     {
         //Get start point, get end point
-	QPoint3D s_point = e.getStart();
-	QPoint3D e_point = e.getEnd();
+        QPoint3D s_point = e.getStart();
+        QPoint3D e_point = e.getEnd();
 
         //Draw line
         qp.drawLine(s_point,e_point);
