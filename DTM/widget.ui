@@ -77,6 +77,16 @@
       <widget class="QLineEdit" name="lineEdit_3"/>
      </item>
      <item>
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Main contour line</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit_4"/>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_3">
        <property name="text">
         <string>Create contours</string>

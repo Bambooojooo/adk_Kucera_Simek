@@ -11,10 +11,12 @@ Widget::Widget(QWidget *parent)
     zmin = 100.0;
     zmax = 1000.0;
     dz = 50;
+    k = 5;
 
     ui->lineEdit->setText(QString::number(zmin));
     ui->lineEdit_2->setText(QString::number(zmax));
     ui->lineEdit_3->setText(QString::number(dz));
+    ui->lineEdit_4->setText(QString::number(k));
 }
 
 
@@ -84,6 +86,7 @@ void Widget::on_pushButton_3_clicked()
         //Set contours
         ui->Canvas->setContours(contours);
         ui->Canvas->setdZ(dz);
+        ui->Canvas->setK(k);
 
         repaint();
     }
@@ -109,3 +112,9 @@ void Widget::on_pushButton_4_clicked()
         repaint();
     }
 }
+
+void Widget::on_lineEdit_4_editingFinished()
+{
+    k = ui->lineEdit_4->text().toDouble();
+}
+

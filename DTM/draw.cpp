@@ -39,41 +39,45 @@ void Draw::paintEvent(QPaintEvent *event)
 
     Algorithms a;
     //Draw contour lines
-    int it=0;
-    qp.setBackground(Qt::red);
-    qp.save();
     for (Edge c:contours)
     {
         //Get start point, get end point
         QPoint3D s_point = c.getStart();
         QPoint3D e_point = c.getEnd();
 
+        //Center of contour line
         QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
 
-
+        //Height of contour line
         int zz=s_point.getZ();
-        int d=dz*5;
+        //
+        int d=dz*k;
 
+        //Set pen
         qp.setPen(QPen(Qt::black,1));
         if (zz%d == 0)
         {
-
+            //Draw main contour line
             qp.setPen(QPen(Qt::black,2));
             qp.drawLine(s_point,e_point);
+            //Draw description of contour line in 50% procent of events
             if (rand() % 100 < 50)
             {
-
+                //Angle of contour line
                 double s = atan2(e_point.y()-s_point.y(), e_point.x() - s_point.x());
                 if  (s < 0)
                     s+=2*M_PI;
 
+                //Transform canvas to origin of axes
                 QTransform t;
                 t.translate(z.x(), z.y());
                 t.rotate(s*180/M_PI);
                 qp.setTransform(t);
+                //Draw hidding line of contour line
                 qp.setPen(QPen(Qt::white,5));
                 qp.drawLine(QPoint(5,0),QPoint(25,0));
                 qp.setPen(QPen(Qt::black,1));
+                //Draw text
                 qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
                 qp.resetTransform();
             }
