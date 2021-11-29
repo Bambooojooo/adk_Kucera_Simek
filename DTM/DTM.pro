@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     qpoint3d.cpp \
     sortbyx.cpp \
+    triangle.cpp \
     widget.cpp
 
 HEADERS += \
@@ -30,6 +31,7 @@ HEADERS += \
     edge.h \
     qpoint3d.h \
     sortbyx.h \
+    triangle.h \
     widget.h
 
 FORMS += \

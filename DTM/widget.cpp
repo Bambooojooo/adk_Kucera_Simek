@@ -10,7 +10,7 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
     zmin = 100.0;
     zmax = 1000.0;
-    dz = 5.0;
+    dz = 50;
 
     ui->lineEdit->setText(QString::number(zmin));
     ui->lineEdit_2->setText(QString::number(zmax));
@@ -61,15 +61,51 @@ void Widget::on_lineEdit_editingFinished()
 
 void Widget::on_lineEdit_2_editingFinished()
 {
-    zmax = ui->lineEdit->text().toDouble();
+    zmax = ui->lineEdit_2->text().toDouble();
 }
 
 void Widget::on_lineEdit_3_editingFinished()
 {
-    dz = ui->lineEdit->text().toDouble();
+    dz = ui->lineEdit_3->text().toDouble();
 }
 
 void Widget::on_pushButton_3_clicked()
 {
+    //Create contours
+    std::vector<Edge> dt = ui->Canvas->getDT();
+
+    //Is the triangulation not empty?
+    if (dt.size() > 0)
+    {
+        Algorithms a;
+        //Create contours
+        std::vector<Edge> contours = a.getContourLines(dt, zmin, zmax, dz);
+
+        //Set contours
+        ui->Canvas->setContours(contours);
+        ui->Canvas->setdZ(dz);
+
+        repaint();
+    }
+
 }
 
+
+void Widget::on_pushButton_4_clicked()
+{
+    //Draw slope
+    std::vector<Edge> dt = ui->Canvas->getDT();
+
+    //Is the triangulation not empty?
+    if (dt.size() > 0)
+    {
+        Algorithms a;
+        //Analyze DTM
+        std::vector<Triangle> triangles = a.analyzeDTM(dt);
+
+        //Set triangles
+        ui->Canvas->setTriangles(triangles);
+
+        repaint();
+    }
+}

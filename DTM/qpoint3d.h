@@ -16,6 +16,7 @@ class QPoint3D : public QPointF
 
         double getZ(){return z;}
         void setZ(double z_){z = z_;}
+
 };
 
 #endif // QPOINT3D_H

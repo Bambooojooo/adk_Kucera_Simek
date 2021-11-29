@@ -5,6 +5,7 @@
 #include <vector>
 #include "edge.h"
 #include "qpoint3d.h"
+#include "triangle.h"
 
 
 class Algorithms
@@ -19,6 +20,10 @@ public:
     void updateAEL(Edge &e, std::list<Edge> &ael);
     QPoint3D getContourPoint(QPoint3D &p1, QPoint3D &p2, double z);
     std::vector<Edge> getContourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz);
+    double getSlope(QPoint3D &p1, QPoint3D &p2, QPoint3D &p3);
+    double getExposition(QPoint3D &p1, QPoint3D &p2, QPoint3D &p3);
+    std::vector<Triangle> analyzeDTM(std::vector<Edge> &dt);
+    QPoint3D getRotatedPoint(QPoint3D &p, double om);
 };
 
 #endif // ALGORITHMS_H

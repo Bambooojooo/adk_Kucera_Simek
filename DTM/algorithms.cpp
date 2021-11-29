@@ -1,6 +1,8 @@
 #include "algorithms.h"
 #include "sortbyx.h"
 #include <list>
+#include <cmath>
+#include <iostream>
 
 Algorithms::Algorithms()
 {
@@ -202,7 +204,7 @@ std::vector<Edge> Algorithms::dT(std::vector<QPoint3D> &points)
             updateAEL(e3, ael);
         }
     }
-
+    std::cout<< dt.size() << std::endl;
     return dt;
 }
 
@@ -233,6 +235,8 @@ QPoint3D Algorithms::getContourPoint(QPoint3D &p1, QPoint3D &p2, double z)
     //Get countour point intersection of triangle and horizontal countour
     double xb = (p2.x()-p1.x())/(p2.getZ()-p1.getZ())*(z-p1.getZ())+p1.x();
     double yb = (p2.y()-p1.y())/(p2.getZ()-p1.getZ())*(z-p1.getZ())+p1.y();
+
+    return QPoint3D(xb, yb, z);
 }
 
 std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz)
@@ -322,3 +326,77 @@ std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin
 
     return contours;
 }
+
+double Algorithms::getSlope(QPoint3D &p1, QPoint3D &p2, QPoint3D &p3)
+{
+    //Compute slope of triangle
+    double ux = p1.x() - p2.x();
+    double uy = p1.y() - p2.y();
+    double uz = p1.getZ() - p2.getZ();
+
+    double vx = p3.x() - p2.x();
+    double vy = p3.y() - p2.y();
+    double vz = p3.getZ() - p2.getZ();
+
+    //Normal vector
+    double nx = uy*vz - vy*uz;
+    double ny = -ux*vz + vx*uz;
+    double nz = ux*vy - vx*uy;
+
+    //Norm
+    double n = sqrt(nx*nx + ny*ny + nz*nz);
+
+    return acos(nz/n);
+}
+
+double Algorithms:: getExposition(QPoint3D &p1, QPoint3D &p2, QPoint3D &p3)
+{
+    //Compute exposition (direction of the projected normal vector)
+    double ux = p1.x() - p2.x();
+    double uy = p1.y() - p2.y();
+    double uz = p1.getZ() - p2.getZ();
+
+    double vx = p3.x() - p2.x();
+    double vy = p3.y() - p2.y();
+    double vz = p3.getZ() - p2.getZ();
+
+    //Normal vector
+    double nx = uy*vz - vy*uz;
+    double ny = -ux*vz + vx*uz;
+    double nz = ux*vy - vx*uy;
+
+    //Direction of the vector
+    return atan2(nx, ny);
+}
+
+std::vector<Triangle> Algorithms::analyzeDTM(std::vector<Edge> &dt)
+{
+    //Computing slope and exposition for each triangle
+    std::vector<Triangle> triangles;
+    for (int i = 0; i < dt.size(); i+=3)
+    {
+        //Get triangle edges
+        Edge e1 = dt[i];
+        Edge e2 = dt[i+1];
+
+        //Get triangle vertices
+        QPoint3D p1 = e1.getStart();
+        QPoint3D p2 = e1.getEnd();
+        QPoint3D p3 = e2.getEnd();
+
+        //Compute slope and exposition
+        double slope = getSlope(p1, p2, p3);
+        double exposition = getExposition(p1, p2, p3);
+
+        //Create triangle
+        Triangle t(p1, p2, p3, slope, exposition);
+
+        //Add triangle to the list
+        triangles.push_back(t);
+    }
+
+    return triangles;
+}
+
+
+
