@@ -3,10 +3,11 @@
 #include <list>
 #include <cmath>
 #include <iostream>
+#include <random>
 
 Algorithms::Algorithms()
 {
-
+    srand (time(NULL));
 }
 
 int Algorithms::getPointLinePosition(QPoint3D &a,QPoint3D &p1,QPoint3D &p2)
@@ -396,6 +397,59 @@ std::vector<Triangle> Algorithms::analyzeDTM(std::vector<Edge> &dt)
     }
 
     return triangles;
+}
+
+std::vector<QPoint3D> Algorithms::generatePile(QSize &size_canvas, int n)
+{
+
+    std::vector<QPoint3D> points;
+    //Coordinates of random point
+    double height, width;
+    double z_top = 1000;
+    double z_bottom = 0;
+    //Centroid coordintes
+    double tw, th;
+    for (int i = 0; i<n; i+=1)
+    {
+        //Generate random coordinates
+        height = rand() % size_canvas.height();
+        width = rand() % size_canvas.width();
+
+        points.push_back(QPoint3D(width, height));
+
+        tw+=width;
+        th+=height;
+    }
+
+    tw=tw/n;
+    th=th/n;
+
+
+//    points.push_back(QPoint3D(tw, th, 1000));
+
+    //Compute z coordinates
+    double z;
+    for (int i = 0; i<n; i+=1)
+    {
+        double dh = points[i].y() - th;
+        double dw = points[i].x() - tw;
+
+        double d = sqrt(dw*dw + dh*dh);
+
+        z =  d + rand() % 10;
+        points[i].setZ(z_top - z);
+
+    }
+
+    return points;
+}
+
+double Algorithms::pointDist(QPoint3D &p1, QPoint3D &p2)
+{
+    double dx = p1.x() - p2.x();
+    double dy = p1.y() - p2.y();
+
+    return sqrt(dx*dx + dy*dy);
 }
 
 

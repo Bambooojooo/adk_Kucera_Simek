@@ -2,13 +2,14 @@
 #include "ui_widget.h"
 #include "algorithms.h"
 #include "edge.h"
+#include <iostream>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-    zmin = 100.0;
+    zmin = 100;
     zmax = 1000.0;
     dz = 50;
     k = 5;
@@ -126,4 +127,19 @@ void Widget::on_pushButton_5_clicked()
     repaint();
 
 }
+
+
+void Widget::on_pushButton_7_clicked()
+{
+    QString shape = ui->comboBox->currentText();
+
+    QSize size = ui->Canvas->size();
+
+    Algorithms a;
+    std::vector<QPoint3D> points = a.generatePile(size, 100);
+
+    ui->Canvas->setPoints(points);
+    repaint();
+}
+
 

@@ -24,6 +24,8 @@ public:
     double getExposition(QPoint3D &p1, QPoint3D &p2, QPoint3D &p3);
     std::vector<Triangle> analyzeDTM(std::vector<Edge> &dt);
     QPoint3D getRotatedPoint(QPoint3D &p, double om);
+    std::vector<QPoint3D> generatePile(QSize &size_canvas, int n);
+    double pointDist(QPoint3D &p1, QPoint3D &p2);
 };
 
 #endif // ALGORITHMS_H

@@ -37,6 +37,9 @@ public:
     void setRotate(double om_){om=om_;};
     void clearDT();
     void clearContours();
+    void generateShapes();
+    void setPoints(std::vector<QPoint3D> &points_){points = points_;}
+
 
 
 
