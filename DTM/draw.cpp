@@ -37,7 +37,7 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.drawLine(s_point,e_point);
     }
 
-    Algorithms a;
+
     //Draw contour lines
     for (Edge c:contours)
     {
@@ -121,8 +121,6 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.drawPolygon(pol);
     }
 
-    //Stop drawing
-    qp.end();
 }
 
 void Draw::mousePressEvent(QMouseEvent *event)
@@ -153,4 +151,11 @@ void Draw::clearDT()
     dt.clear();
     repaint();
 }
+
+void Draw::clearContours()
+{
+    contours.clear();
+    repaint();
+}
+
 

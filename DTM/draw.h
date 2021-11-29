@@ -18,6 +18,7 @@ private:
     std::vector<Triangle> triangles;
     int dz;
     int k;
+    double om;
 
 public:
     explicit Draw(QWidget *parent = nullptr);
@@ -33,7 +34,9 @@ public:
     std::vector<Edge> getContours(){return contours;}
     std::vector<Triangle> getTriangles(){return triangles;}
     void setTriangles(std::vector<Triangle> &triangles_){triangles = triangles_;}
+    void setRotate(double om_){om=om_;};
     void clearDT();
+    void clearContours();
 
 
 

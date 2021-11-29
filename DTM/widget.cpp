@@ -118,3 +118,12 @@ void Widget::on_lineEdit_4_editingFinished()
     k = ui->lineEdit_4->text().toDouble();
 }
 
+
+
+void Widget::on_pushButton_5_clicked()
+{
+    ui->Canvas->clearContours();
+    repaint();
+
+}
+
