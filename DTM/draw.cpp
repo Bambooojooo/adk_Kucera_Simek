@@ -14,13 +14,13 @@ void Draw::paintEvent(QPaintEvent *event)
     QPainter qp(this);
     qp.begin(this);
 
-
     //Draw points
     int r=4;
     QPolygon pol;
 
     for (int i=0; i<points.size(); i++)
     {
+
         qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
         pol.append(QPoint(points[i].x(), points[i].y()));
 
@@ -34,10 +34,11 @@ void Draw::paintEvent(QPaintEvent *event)
         QPoint3D e_point = e.getEnd();
 
         //Draw line
+        qp.setPen(QPen(Qt::green, 1));
         qp.drawLine(s_point,e_point);
     }
 
-
+    Algorithms a;
     //Draw contour lines
     for (Edge c:contours)
     {
@@ -53,41 +54,46 @@ void Draw::paintEvent(QPaintEvent *event)
         //
         int d=dz*k;
 
+        QColor brown("#a52a2a");
         //Set pen
-        qp.setPen(QPen(Qt::black,1));
+        qp.setPen(QPen(brown,1));
+
         if (zz%d == 0)
         {
             //Draw main contour line
-            qp.setPen(QPen(Qt::black,2));
+            qp.setPen(QPen(brown,2));
             qp.drawLine(s_point,e_point);
             //Draw description of contour line in 50% procent of events
-            if (rand() % 100 < 50)
+            if (a.pointDist(s_point, e_point) > 50)
             {
-                //Angle of contour line
-                double s = atan2(e_point.y()-s_point.y(), e_point.x() - s_point.x());
-                if  (s < 0)
-                    s+=2*M_PI;
+                if (rand() % 100 < 40)
+                {
+                    //Angle of contour line
+                    double s = atan2(e_point.y()-s_point.y(), e_point.x() - s_point.x());
+                    if  (s < 0)
+                        s+=2*M_PI;
 
-                //Transform canvas to origin of axes
-                QTransform t;
-                t.translate(z.x(), z.y());
-                t.rotate(s*180/M_PI);
-                qp.setTransform(t);
-                //Draw hidding line of contour line
-                qp.setPen(QPen(Qt::white,5));
-                qp.drawLine(QPoint(5,0),QPoint(25,0));
-                qp.setPen(QPen(Qt::black,1));
-                //Draw text
-                qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
-                qp.resetTransform();
+                    //Transform canvas to origin of axes
+                    QTransform t;
+                    t.translate(z.x(), z.y());
+                    t.rotate(s*180/M_PI);
+                    qp.setTransform(t);
+                    //Draw hidding line of contour line
+                    qp.setPen(QPen(Qt::white,5));
+                    qp.drawLine(QPoint(5,0),QPoint(25,0));
+                    qp.setPen(QPen(brown,1));
+                    //Draw text
+                    qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
+                    qp.resetTransform();
+                }
             }
-            qp.setPen(QPen(Qt::black,1));
+            qp.setPen(QPen(brown,1));
 
         }
         else
             qp.drawLine(s_point,e_point);
 
-    }
+        }
 
 
     //Draw slope
@@ -157,5 +163,11 @@ void Draw::clearContours()
     contours.clear();
     repaint();
 }
+
+void Draw::generateShapes()
+{
+//    std::cout <<
+}
+
 
 
