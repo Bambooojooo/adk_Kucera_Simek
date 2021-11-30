@@ -11,7 +11,7 @@ class Widget : public QWidget
 {
     Q_OBJECT
     private:
-        double zmin, zmax, dz, k;
+        double zmin, zmax, dz, k, n_points;
 
 public:
     Widget(QWidget *parent = nullptr);
@@ -41,6 +41,10 @@ private slots:
 
     void on_pushButton_7_clicked();
 
+
+    void on_lineEdit_5_editingFinished();
+
+//    void on_pushButton_6_clicked();
 
 private:
     Ui::Widget *ui;

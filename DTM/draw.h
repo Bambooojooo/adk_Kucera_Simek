@@ -19,6 +19,10 @@ private:
     int dz;
     int k;
     double om;
+    int z_min;
+    int z_max;
+    QString set_col;
+
 
 public:
     explicit Draw(QWidget *parent = nullptr);
@@ -31,14 +35,17 @@ public:
     void setContours(std::vector<Edge> &contours_){contours = contours_;}
     void setdZ(int dz_){dz=dz_;}
     void setK(int k_){k=k_;}
+    void setz_min(int zmin_){z_min=zmin_;}
     std::vector<Edge> getContours(){return contours;}
     std::vector<Triangle> getTriangles(){return triangles;}
     void setTriangles(std::vector<Triangle> &triangles_){triangles = triangles_;}
-    void setRotate(double om_){om=om_;};
+    void setRotate(double om_){om=(om_*M_PI)/180;};
     void clearDT();
     void clearContours();
     void generateShapes();
     void setPoints(std::vector<QPoint3D> &points_){points = points_;}
+    void setz_max(int z_max_){z_max=z_max_;}
+    void setColor(QString &color_){set_col = color_;}
 
 
 
