@@ -3,6 +3,8 @@
 #include "algorithms.h"
 #include "edge.h"
 #include <iostream>
+#include <QtGui>
+
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -13,11 +15,14 @@ Widget::Widget(QWidget *parent)
     zmax = 1000.0;
     dz = 50;
     k = 5;
+    n_points = 100;
 
     ui->lineEdit->setText(QString::number(zmin));
     ui->lineEdit_2->setText(QString::number(zmax));
     ui->lineEdit_3->setText(QString::number(dz));
     ui->lineEdit_4->setText(QString::number(k));
+    ui->lineEdit_5->setText(QString::number(n_points));
+
 }
 
 
@@ -82,12 +87,19 @@ void Widget::on_pushButton_3_clicked()
     {
         Algorithms a;
         //Create contours
+
+//        zmin = ui->lineEdit->text().toDouble();
+        zmax = ui->lineEdit_2->text().toDouble();
+
         std::vector<Edge> contours = a.getContourLines(dt, zmin, zmax, dz);
+
+        std::cout << "zmin " << zmin << " zmax " << zmax << std::endl;
 
         //Set contours
         ui->Canvas->setContours(contours);
         ui->Canvas->setdZ(dz);
         ui->Canvas->setK(k);
+        ui->Canvas->setz_min(zmin);
 
         repaint();
     }
@@ -109,6 +121,8 @@ void Widget::on_pushButton_4_clicked()
 
         //Set triangles
         ui->Canvas->setTriangles(triangles);
+        QString col = ui->comboBox_2->currentText();
+        ui->Canvas->setColor(col);
 
         repaint();
     }
@@ -136,10 +150,44 @@ void Widget::on_pushButton_7_clicked()
     QSize size = ui->Canvas->size();
 
     Algorithms a;
-    std::vector<QPoint3D> points = a.generatePile(size, 100);
+    std::vector<QPoint3D> points = a.generateRandomPoints(size, n_points);
+    if (shape == "Saddle")
+        points = a.generateSaddle(points);
+    else if (shape == "Pile")
+        points = a.generatePile(points);
+    else if (shape == "Ridge")
+        points = a.generateRidge(points);
+    else if (shape == "Rest")
+        points = a.generateRest(points);
+
+    points.pop_back();
+
+    int max = a.findMaxZ(points);
+    int min = a.findMinZ(points);
+
+
 
     ui->Canvas->setPoints(points);
+//    ui->Canvas->setz_max(max);
+//    ui->Canvas->setz_min(min);
+
+    ui->lineEdit->setText(QString::number(min));
+    ui->lineEdit_2->setText(QString::number(max));
     repaint();
 }
 
+
+
+void Widget::on_lineEdit_5_editingFinished()
+{
+    n_points = ui->lineEdit_5->text().toDouble();
+}
+
+
+//void Widget::on_pushButton_6_clicked()
+//{
+//    QString om = ui->lineEdit_6->text();
+//    ui->Canvas->setRotate(om.toDouble());
+//    repaint();
+//}
 

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "algorithms.h"
 #include <iostream>
+#include <string>
 
 Draw::Draw(QWidget *parent) : QWidget(parent)
 {
@@ -17,9 +18,13 @@ void Draw::paintEvent(QPaintEvent *event)
     //Draw points
     int r=4;
     QPolygon pol;
+    Algorithms a;
+
+//    std::cout << "om " << om << std::endl;
 
     for (int i=0; i<points.size(); i++)
     {
+
 
         qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
         pol.append(QPoint(points[i].x(), points[i].y()));
@@ -38,7 +43,7 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.drawLine(s_point,e_point);
     }
 
-    Algorithms a;
+//    Algorithms a;
     //Draw contour lines
     for (Edge c:contours)
     {
@@ -58,7 +63,7 @@ void Draw::paintEvent(QPaintEvent *event)
         //Set pen
         qp.setPen(QPen(brown,1));
 
-        if (zz%d == 0)
+        if ((zz+z_min)%d == 0)
         {
             //Draw main contour line
             qp.setPen(QPen(brown,2));
@@ -66,12 +71,13 @@ void Draw::paintEvent(QPaintEvent *event)
             //Draw description of contour line in 50% procent of events
             if (a.pointDist(s_point, e_point) > 50)
             {
-                if (rand() % 100 < 40)
+                if (rand() % 100 < 50)
                 {
                     //Angle of contour line
-                    double s = atan2(e_point.y()-s_point.y(), e_point.x() - s_point.x());
+                    double s = atan((e_point.y()-s_point.y())/ (e_point.x() - s_point.x()));
                     if  (s < 0)
                         s+=2*M_PI;
+
 
                     //Transform canvas to origin of axes
                     QTransform t;
@@ -85,6 +91,7 @@ void Draw::paintEvent(QPaintEvent *event)
                     //Draw text
                     qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
                     qp.resetTransform();
+
                 }
             }
             qp.setPen(QPen(brown,1));
@@ -95,10 +102,10 @@ void Draw::paintEvent(QPaintEvent *event)
 
         }
 
-
+    std::cout << set_col.QString::toStdString() << std::endl;
     //Draw slope
     double k = 255/M_PI;
-
+//    QColor color;
     for (Triangle t:triangles)
     {
         //Get vertices of each triangle
@@ -111,7 +118,17 @@ void Draw::paintEvent(QPaintEvent *event)
 
         //Convert to color
         int col = 255 - k * slope;
-        QColor color(col, col, col);
+
+        QColor color;
+        if (set_col == "Red")
+            color.setRgb(col, 0, 0);
+        else if (set_col == "Green")
+            color.setRgb(0, col, 0);
+        else if (set_col == "Blue")
+            color.setRgb(0, 0, col);
+        else if (set_col == "Grey")
+            color.setRgb(col, col, col);
+
 
         //Set pen and brush
         qp.setBrush(color);
