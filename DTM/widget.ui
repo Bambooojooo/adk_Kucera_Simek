@@ -27,6 +27,13 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QPushButton" name="pushButton_Load">
+       <property name="text">
+        <string>Load data</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>Create DT</string>
@@ -214,7 +221,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_2">
        <property name="text">
-        <string>Clear</string>
+        <string>Clear points</string>
        </property>
       </widget>
      </item>
@@ -228,7 +235,7 @@
      <item>
       <widget class="QPushButton" name="pushButton_5">
        <property name="text">
-        <string>Clear contours</string>
+        <string>Clear drawing</string>
        </property>
       </widget>
      </item>

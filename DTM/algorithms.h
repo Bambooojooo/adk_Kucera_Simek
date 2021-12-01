@@ -33,6 +33,9 @@ public:
 //    QPoint3D getProjectedPoint(QPoint3D &p, double om);
     std::vector<QPoint3D> generateRidge(std::vector<QPoint3D> &points);
     std::vector<QPoint3D> generateRest(std::vector<QPoint3D> &points);
+
+    //Transformation
+    static std::vector<QPoint3D> transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y);
 };
 
 #endif // ALGORITHMS_H

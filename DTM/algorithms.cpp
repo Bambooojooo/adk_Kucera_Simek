@@ -486,8 +486,6 @@ std::vector<QPoint3D> Algorithms::generateSaddle(std::vector<QPoint3D> &points)
 
         points[i].setZ(z);
     }
-
-
     return points;
 }
 
@@ -500,7 +498,6 @@ int Algorithms::findMaxZ(std::vector<QPoint3D> &points)
         if (p.getZ() > max)
             max=p.getZ();
     }
-
     return max;
 }
 int Algorithms::findMinZ(std::vector<QPoint3D> &points)
@@ -512,7 +509,6 @@ int Algorithms::findMinZ(std::vector<QPoint3D> &points)
         if (p.getZ() < min)
             min=p.getZ();
     }
-
     return min;
 }
 
@@ -533,9 +529,7 @@ std::vector<QPoint3D> Algorithms::generateRidge(std::vector<QPoint3D> &points)
 
         points[i].setZ(z);
     }
-
     return points;
-
 }
 
 std::vector<QPoint3D> Algorithms::generateRest(std::vector<QPoint3D> &points)
@@ -545,12 +539,10 @@ std::vector<QPoint3D> Algorithms::generateRest(std::vector<QPoint3D> &points)
     QPoint3D qmax = *max_element(points.begin(), points.end(), sortByX());
     QPoint3D qmin = *min_element(points.begin(), points.end(), sortByX());
 
-
     double rangex = (qmax.x()-qmin.x())/3;
     double rangey = (qmax.y()-qmin.y())/3;
 
     int std = 10;
-
 
     double z;
     for (int i = 0; i<n; i+=1)
@@ -570,12 +562,35 @@ std::vector<QPoint3D> Algorithms::generateRest(std::vector<QPoint3D> &points)
 
         points[i].setZ(z);
     }
-
     return points;
-
 }
 
+std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y)
+{
+	//Transform polygon coorinates by basic transformation based on minmax box of dataset
+	//x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
+	std::vector<QPoint3D> points_transformed;
 
+	for (QPoint3D p : points_3d)
+	{
+		//Translation with slight offset due to canvas origin set on [11,11] coors
+		double dx = p.x()-trans_x-delta_x;
+		double dy = p.y()-trans_y-delta_y;
+
+		//Data scaling
+		double ddx = dx*(scale/1.1);
+		double ddy = dy*(scale/1.1);
+
+		//Translate data back to visible part of Canvas
+		double x0 = ddx + delta_x;
+		double y0 = ddy + delta_y;
+
+		points_transformed.push_back(QPoint3D(x0, y0, p.getZ()));
+	}
+
+	//Compute transformation key
+	return points_transformed;
+}
 
 
 

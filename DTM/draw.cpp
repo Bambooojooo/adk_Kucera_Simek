@@ -1,6 +1,7 @@
 #include "draw.h"
-#include <stdlib.h>
 #include "algorithms.h"
+
+#include <stdlib.h>
 #include <iostream>
 #include <string>
 
@@ -15,20 +16,21 @@ void Draw::paintEvent(QPaintEvent *event)
     QPainter qp(this);
     qp.begin(this);
 
-    //Draw points
+    //Draw clicked points
     int r=4;
     QPolygon pol;
     Algorithms a;
 
-//    std::cout << "om " << om << std::endl;
-
     for (int i=0; i<points.size(); i++)
     {
-
-
         qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
         pol.append(QPoint(points[i].x(), points[i].y()));
+    }
 
+    //Draw csv_points
+    for (QPoint3D point_3d: csv_points)
+    {
+	qp.drawEllipse(point_3d.x()-r,point_3d.y()-r,2*r,2*r);
     }
 
     //Draw triangulation
@@ -43,7 +45,6 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.drawLine(s_point,e_point);
     }
 
-//    Algorithms a;
     //Draw contour lines
     for (Edge c:contours)
     {
@@ -56,18 +57,21 @@ void Draw::paintEvent(QPaintEvent *event)
 
         //Height of contour line
         int zz=s_point.getZ();
-        //
+
+	//Height interval for main contour lines
         int d=dz*k;
 
         QColor brown("#a52a2a");
         //Set pen
         qp.setPen(QPen(brown,1));
 
+	//Main contour lines
         if ((zz+z_min)%d == 0)
         {
             //Draw main contour line
             qp.setPen(QPen(brown,2));
             qp.drawLine(s_point,e_point);
+
             //Draw description of contour line in 50% procent of events
             if (a.pointDist(s_point, e_point) > 50)
             {
@@ -78,32 +82,34 @@ void Draw::paintEvent(QPaintEvent *event)
                     if  (s < 0)
                         s+=2*M_PI;
 
-
                     //Transform canvas to origin of axes
                     QTransform t;
                     t.translate(z.x(), z.y());
                     t.rotate(s*180/M_PI);
                     qp.setTransform(t);
+
                     //Draw hidding line of contour line
                     qp.setPen(QPen(Qt::white,5));
                     qp.drawLine(QPoint(5,0),QPoint(25,0));
                     qp.setPen(QPen(brown,1));
+
                     //Draw text
                     qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
                     qp.resetTransform();
-
                 }
             }
             qp.setPen(QPen(brown,1));
-
         }
+
+	//Regular contour line
         else
             qp.drawLine(s_point,e_point);
-
         }
 
     std::cout << set_col.QString::toStdString() << std::endl;
+
     //Draw slope
+    //Koeficient for slope drawing (bits and radians relation)
     double k = 255/M_PI;
 //    QColor color;
     for (Triangle t:triangles)
@@ -129,7 +135,6 @@ void Draw::paintEvent(QPaintEvent *event)
         else if (set_col == "Grey")
             color.setRgb(col, col, col);
 
-
         //Set pen and brush
         qp.setBrush(color);
         qp.setPen(color);
@@ -143,7 +148,6 @@ void Draw::paintEvent(QPaintEvent *event)
         //Draw triangle
         qp.drawPolygon(pol);
     }
-
 }
 
 void Draw::mousePressEvent(QMouseEvent *event)
@@ -163,28 +167,27 @@ void Draw::mousePressEvent(QMouseEvent *event)
     repaint();
 }
 
-void Draw::clear()
-{
-    points.clear();
-    repaint();
-}
-
-void Draw::clearDT()
-{
-    dt.clear();
-    repaint();
-}
-
-void Draw::clearContours()
-{
-    contours.clear();
-    repaint();
-}
-
 void Draw::generateShapes()
 {
 //    std::cout <<
 }
+
+void Draw::drawCSVPoints(std::vector<QPoint3D> &points_3d)
+{
+	//Get transformation parameters
+	double trans_x = getTransX();
+	double trans_y = getTransY();
+	double scale = getScale();
+	int delta_x = getDeltaX();
+	int delta_y = getDeltaY();
+
+	//Draw vector of points
+	std::vector<QPoint3D> transformedPoints = Algorithms::transformPoints(points_3d, trans_x, trans_y, scale, delta_x, delta_y);
+	Draw::setCSVPoints(transformedPoints);
+
+	repaint();
+}
+
 
 
 
