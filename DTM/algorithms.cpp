@@ -243,7 +243,7 @@ QPoint3D Algorithms::getContourPoint(QPoint3D &p1, QPoint3D &p2, double z)
     return QPoint3D(xb, yb, z);
 }
 
-std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin, double zmax, double dz)
+std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin, double zmax, int dz)
 {
     //Get countour lines from delaunay triangulation
     std::vector<Edge> contours;
@@ -262,6 +262,7 @@ std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin
         double z3 = p3.getZ();
 
         //Check all horizontal planes
+//        for (double z = 0; z <= zmax; z+=dz)
         for (double z = zmin; z <= zmax; z+=dz)
         {
             //Height differences
@@ -620,7 +621,7 @@ std::map<double, std::vector<Edge>> Algorithms::getMainContourLines(std::vector<
     return contours_main;
 }
 
-std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, int contour_interval, double dz, double &threshold)
+std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &threshold)
 {
     //Get contour lines where height labels needs to be labeled
     std::vector<Edge> distanced_edges;
@@ -630,6 +631,7 @@ std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, in
 
     for (std::pair<double, std::vector<Edge>> element : main_contours)
     {
+        contours_main.insert(contours_main.begin(), element.second.begin(), element.second.end());
         distanced_edges = getDistancedEdges(element.second, threshold);
         contours_labeled.insert(contours_labeled.end(), distanced_edges.begin(), distanced_edges.end());
     }

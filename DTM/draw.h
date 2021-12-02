@@ -16,6 +16,7 @@ private:
     std::vector<QPoint3D> csv_points;
     std::vector<Edge> dt;
     std::vector<Edge> contours;
+    std::vector<Edge> contours_main;
     std::vector<Edge> contours_labeled;
     std::vector<Triangle> triangles;
     int dz;
@@ -32,7 +33,7 @@ public:
     explicit Draw(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void clearPoints(){points.clear(); csv_points.clear();}
+    void clearPoints(){points.clear(); csv_points.clear(); contours_main.clear();}
     void clearDT(){dt.clear();}
     void clearContours(){contours.clear(); contours_labeled.clear();}
     void clearTriangles(){triangles.clear();}
@@ -44,6 +45,7 @@ public:
     std::vector<QPoint3D> getCSVPoints(){return csv_points;}
     std::vector<Edge> getDT(){return dt;}    
     std::vector<Edge> getContours(){return contours;}
+    std::vector<Edge> getContoursMain(){return contours_main;}
     std::vector<Triangle> getTriangles(){return triangles;}
     std::vector<Edge> getContoursLabeled(){return contours_labeled;}
     int getZMin(){return z_min;}
@@ -61,6 +63,7 @@ public:
     void setTriangles(std::vector<Triangle> &triangles_){triangles = triangles_;}
     void setRotate(double om_){om=(om_*M_PI)/180;};
     void setContours(std::vector<Edge> &contours_){contours = contours_;}
+    void setContoursMain(std::vector<Edge> &contours_main_){contours_main = contours_main_;}
     void setdZ(int dz_){dz=dz_;}
     void setK(int k_){k=k_;}
     void setz_min(int zmin_){z_min=zmin_;}

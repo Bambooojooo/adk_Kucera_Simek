@@ -60,10 +60,12 @@ void Draw::paintEvent(QPaintEvent *event)
         int zz=s_point.getZ();
 
         //Height interval for main contour lines
-            int d=dz*k;
+        int d=dz*k;
+
+//        qp.drawLine(s_point,e_point);
 
         //Main contour lines
-        if ((zz+z_min)%d == 0)
+        if ((zz)%d == 0)
             {
                 //Draw main contour line
                 qp.setPen(QPen(brown,2));
@@ -73,9 +75,24 @@ void Draw::paintEvent(QPaintEvent *event)
         //Regular contour line
         else
             qp.drawLine(s_point,e_point);
-        }
+    }
 
     std::cout << set_col.QString::toStdString() << std::endl;
+
+    //Main contour lines
+    for (Edge c:contours_main)
+        {
+            //Defining QColor and pen
+            QColor brown("#a52a2a");
+            qp.setPen(QPen(brown,2));
+
+            //Get start point, get end point
+            QPoint3D s_point = c.getStart();
+            QPoint3D e_point = c.getEnd();
+
+            //Draw main contour line
+            qp.drawLine(s_point,e_point);
+        }
 
     //Draw contour line labes
     for (Edge c:contours_labeled)

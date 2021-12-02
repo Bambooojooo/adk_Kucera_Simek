@@ -93,7 +93,7 @@ void Widget::on_lineEdit_2_editingFinished()
 
 void Widget::on_lineEdit_3_editingFinished()
 {
-    dz = ui->lineEdit_3->text().toDouble();
+    dz = ui->lineEdit_3->text().toInt();
 }
 
 void Widget::on_pushButton_3_clicked()
@@ -106,7 +106,7 @@ void Widget::on_pushButton_3_clicked()
     {
         double z_min = ui->lineEdit->text().toDouble();
         double z_max = ui->lineEdit_2->text().toDouble();
-        double dz = ui->lineEdit_3->text().toDouble();
+        int dz = ui->lineEdit_3->text().toInt();
         int contour_interval = ui->lineEdit_4->text().toInt();
         double label_distance_threshold = 150;
 
@@ -114,8 +114,10 @@ void Widget::on_pushButton_3_clicked()
         std::vector<Edge> contours = Algorithms::getContourLines(dt, z_min, z_max, dz);
 
         //Get main labeled contour lines
-        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(contours, contour_interval, dz, label_distance_threshold);
+        std::vector<Edge> contours_main;
+        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(contours, contours_main, contour_interval, dz, label_distance_threshold);
 
+        ui->Canvas->setContoursMain(contours_main);
         ui->Canvas->setContoursLabeled(contours_labeled);
 
         std::cout << "zmin " << zmin << " zmax " << zmax << std::endl;
@@ -190,12 +192,13 @@ void Widget::on_pushButton_7_clicked()
     else if (shape == "Rest")
         points = a.generateRest(points);
 
+    ui->Canvas->setPoints(points);
     points.pop_back();
 
     int max = a.findMaxZ(points);
     int min = a.findMinZ(points);
 
-    ui->Canvas->setPoints(points);
+
 //    ui->Canvas->setz_max(max);
 //    ui->Canvas->setz_min(min);
 
