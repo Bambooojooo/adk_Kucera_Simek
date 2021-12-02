@@ -20,6 +20,10 @@ public:
         return (s==e2.getStart()) && (e == e2.getEnd());
     }
 
+    bool isNext(const Edge &e2)
+    {
+        return (e == e2.getStart());
+    }
 };
 
 #endif // EDGE_H

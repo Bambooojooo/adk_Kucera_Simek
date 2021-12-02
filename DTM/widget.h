@@ -11,7 +11,8 @@ class Widget : public QWidget
 {
     Q_OBJECT
     private:
-        double zmin, zmax, dz, k, n_points;
+        double zmin, zmax, dz, n_points;
+        int k;
 
 public:
     Widget(QWidget *parent = nullptr);

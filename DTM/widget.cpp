@@ -56,21 +56,21 @@ void Widget::on_pushButton_clicked()
     //Process points
     if (points.size() > 0)
     {
-	std::vector<Edge> dt = a.dT(points);
+    std::vector<Edge> dt = a.dT(points);
 
-	//Set DT
-	ui->Canvas->setDT(dt);
+    //Set DT
+    ui->Canvas->setDT(dt);
 
-	repaint();
+    repaint();
     }
     //No points
     else
     {
-	QMessageBox msg;
-	msg.setText("No points to process. Click them or load them first!");
-	msg.setStandardButtons(QMessageBox::Cancel);
-	msg.setDefaultButton(QMessageBox::Cancel);
-	int ret = msg.exec();
+    QMessageBox msg;
+    msg.setText("No points to process. Click them or load them first!");
+    msg.setStandardButtons(QMessageBox::Cancel);
+    msg.setDefaultButton(QMessageBox::Cancel);
+    int ret = msg.exec();
     }
 }
 
@@ -104,13 +104,19 @@ void Widget::on_pushButton_3_clicked()
     //Is the triangulation not empty?
     if (dt.size() > 0)
     {
-        Algorithms a;
+        double z_min = ui->lineEdit->text().toDouble();
+        double z_max = ui->lineEdit_2->text().toDouble();
+        double dz = ui->lineEdit_3->text().toDouble();
+        int contour_interval = ui->lineEdit_4->text().toInt();
+        double label_distance_threshold = 150;
+
         //Create contours
+        std::vector<Edge> contours = Algorithms::getContourLines(dt, z_min, z_max, dz);
 
-//        zmin = ui->lineEdit->text().toDouble();
-        zmax = ui->lineEdit_2->text().toDouble();
+        //Get main labeled contour lines
+        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(contours, contour_interval, dz, label_distance_threshold);
 
-        std::vector<Edge> contours = a.getContourLines(dt, zmin, zmax, dz);
+        ui->Canvas->setContoursLabeled(contours_labeled);
 
         std::cout << "zmin " << zmin << " zmax " << zmax << std::endl;
 
@@ -124,11 +130,11 @@ void Widget::on_pushButton_3_clicked()
     }
     else
     {
-	QMessageBox msg;
-	msg.setText("No Delaunay triangulation! Create DT first!");
-	msg.setStandardButtons(QMessageBox::Cancel);
-	msg.setDefaultButton(QMessageBox::Cancel);
-	int ret = msg.exec();
+        QMessageBox msg;
+        msg.setText("No Delaunay triangulation! Create DT first!");
+        msg.setStandardButtons(QMessageBox::Cancel);
+        msg.setDefaultButton(QMessageBox::Cancel);
+        int ret = msg.exec();
     }
 }
 
@@ -155,7 +161,7 @@ void Widget::on_pushButton_4_clicked()
 
 void Widget::on_lineEdit_4_editingFinished()
 {
-    k = ui->lineEdit_4->text().toDouble();
+    k = ui->lineEdit_4->text().toInt();
 }
 
 
@@ -214,62 +220,65 @@ void Widget::on_lineEdit_5_editingFinished()
 
 void Widget::on_pushButton_Load_clicked()
 {
-	//Minmax box coors
-	double x_min =  10.e10;
-	double x_max = -10.e10;
-	double y_min =  10.e10;
-	double y_max = -10.e10;
+    //Minmax box coors
+    double x_min =  10.e10;
+    double x_max = -10.e10;
+    double y_min =  10.e10;
+    double y_max = -10.e10;
 
-	//Open dialog to choose data file and store its path to QString
-	QString path(QFileDialog::getOpenFileName(this, tr("Open file with polygons"), "../Data/DMT", tr("CSV Files (*.csv)")));
+    //Open dialog to choose data file and store its path to QString
+    QString path(QFileDialog::getOpenFileName(this, tr("Open file with polygons"), "../Data/DMT", tr("CSV Files (*.csv)")));
 
-	//Convert QString path to string path
-	std::string filename = path.toStdString();
+    //Convert QString path to string path
+    std::string filename = path.toStdString();
 
-	//Read the file with chosen path
-	std::vector<std::vector<std::string>> csv_content = CSV::read_csv(filename);
+    if (filename.length() > 0)
+    {
+        //Read the file with chosen path
+        std::vector<std::vector<std::string>> csv_content = CSV::read_csv(filename);
 
-	std::vector<QPoint3D> points_3d = CSV::getPoints3D(csv_content, x_min, x_max, y_min, y_max);
+        std::vector<QPoint3D> points_3d = CSV::getPoints3D(csv_content, x_min, x_max, y_min, y_max);
 
-	//Get canvas size
-	int canvas_width = ui->Canvas->size().width();
-	int canvas_height = ui->Canvas->size().height();
+        //Get canvas size
+        int canvas_width = ui->Canvas->size().width();
+        int canvas_height = ui->Canvas->size().height();
 
-	//Get size ratio for transformation to canvas
-	double dataset_width = x_max - x_min;
-	double dataset_height = y_max - y_min;
+        //Get size ratio for transformation to canvas
+        double dataset_width = x_max - x_min;
+        double dataset_height = y_max - y_min;
 
-	//Get size ratio for transformation to canvas
-	double x_ratio = canvas_width/dataset_width;
-	double y_ratio = canvas_height/dataset_height;
+        //Get size ratio for transformation to canvas
+        double x_ratio = canvas_width/dataset_width;
+        double y_ratio = canvas_height/dataset_height;
 
-	//Get proper scale for whole dataset visibility without deformation
-	double scale;
-	if (x_ratio < y_ratio)
-		scale = x_ratio;
-	else
-		scale = y_ratio;
-	ui->Canvas->setScale(scale);
+        //Get proper scale for whole dataset visibility without deformation
+        double scale;
+        if (x_ratio < y_ratio)
+            scale = x_ratio;
+        else
+            scale = y_ratio;
+        ui->Canvas->setScale(scale);
 
-	//Get canvas left top corner coors
-	int x_left_top = ui->Canvas->geometry().x();
-	int y_left_top = ui->Canvas->geometry().y();
+        //Get canvas left top corner coors
+        int x_left_top = ui->Canvas->geometry().x();
+        int y_left_top = ui->Canvas->geometry().y();
 
-	//Get left top corner (origin ofset)
-	int delta_x = ui->Canvas->x();
-	int delta_y = ui->Canvas->y();
+        //Get left top corner (origin ofset)
+        int delta_x = ui->Canvas->x();
+        int delta_y = ui->Canvas->y();
 
-	//Set offsets
-	ui->Canvas->setDeltas(delta_x, delta_y);
+        //Set offsets
+        ui->Canvas->setDeltas(delta_x, delta_y);
 
-	//Get translation parameter for transformation
-	double x_trans = x_min - x_left_top;
-	double y_trans = y_min - y_left_top;
+        //Get translation parameter for transformation
+        double x_trans = x_min - x_left_top;
+        double y_trans = y_min - y_left_top;
 
-	//Set translations
-	ui->Canvas->setTrans(x_trans, y_trans);
+        //Set translations
+        ui->Canvas->setTrans(x_trans, y_trans);
 
-	//Draw points
-	ui->Canvas->drawCSVPoints(points_3d);
+        //Draw points
+        ui->Canvas->drawCSVPoints(points_3d);
+    }
 }
 

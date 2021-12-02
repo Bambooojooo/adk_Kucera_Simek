@@ -16,12 +16,12 @@ private:
     std::vector<QPoint3D> csv_points;
     std::vector<Edge> dt;
     std::vector<Edge> contours;
+    std::vector<Edge> contours_labeled;
     std::vector<Triangle> triangles;
     int dz;
     int k;
     double om;
-    int z_min;
-    int z_max;
+    int z_min, z_max;
     double scale;
     double trans_x, trans_y;
     int delta_x, delta_y;
@@ -34,7 +34,7 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void clearPoints(){points.clear(); csv_points.clear();}
     void clearDT(){dt.clear();}
-    void clearContours(){contours.clear();}
+    void clearContours(){contours.clear(); contours_labeled.clear();}
     void clearTriangles(){triangles.clear();}
     void generateShapes();
     void drawCSVPoints(std::vector<QPoint3D> &points_3d);
@@ -45,11 +45,15 @@ public:
     std::vector<Edge> getDT(){return dt;}    
     std::vector<Edge> getContours(){return contours;}
     std::vector<Triangle> getTriangles(){return triangles;}
+    std::vector<Edge> getContoursLabeled(){return contours_labeled;}
+    int getZMin(){return z_min;}
+    int getZMax(){return z_max;}
     double getScale(){return scale;}
     double getTransX(){return trans_x;}
     double getTransY(){return trans_y;}
     int getDeltaX(){return delta_x;}
     int getDeltaY(){return delta_y;}
+    int getContourInterval(){return k;}
 
     //Setters
     void setDT(std::vector<Edge> &dt_){dt = dt_;}
@@ -66,6 +70,7 @@ public:
     void setScale(double &scale_){scale = scale_;}
     void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
     void setDeltas(int &delta_x_, int &delta_y_){delta_x = delta_x_; delta_y = delta_y_;}
+    void setContoursLabeled(std::vector<Edge> &contours_labeled_){contours_labeled=contours_labeled_;}
 
 signals:
 

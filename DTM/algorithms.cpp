@@ -1,9 +1,12 @@
 #include "algorithms.h"
 #include "sortbyx.h"
+
 #include <list>
 #include <cmath>
 #include <iostream>
 #include <random>
+#include <iterator>
+#include <map>
 
 Algorithms::Algorithms()
 {
@@ -567,30 +570,104 @@ std::vector<QPoint3D> Algorithms::generateRest(std::vector<QPoint3D> &points)
 
 std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y)
 {
-	//Transform polygon coorinates by basic transformation based on minmax box of dataset
-	//x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
-	std::vector<QPoint3D> points_transformed;
+    //Transform polygon coorinates by basic transformation based on minmax box of dataset
+    //x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
+    std::vector<QPoint3D> points_transformed;
 
-	for (QPoint3D p : points_3d)
-	{
-		//Translation with slight offset due to canvas origin set on [11,11] coors
-		double dx = p.x()-trans_x-delta_x;
-		double dy = p.y()-trans_y-delta_y;
+    for (QPoint3D p : points_3d)
+    {
+        //Translation with slight offset due to canvas origin set on [11,11] coors
+        double dx = p.x()-trans_x-delta_x;
+        double dy = p.y()-trans_y-delta_y;
 
-		//Data scaling
-		double ddx = dx*(scale/1.1);
-		double ddy = dy*(scale/1.1);
+        //Data scaling
+        double ddx = dx*(scale/1.1);
+        double ddy = dy*(scale/1.1);
 
-		//Translate data back to visible part of Canvas
-		double x0 = ddx + delta_x;
-		double y0 = ddy + delta_y;
+        //Translate data back to visible part of Canvas
+        double x0 = ddx + delta_x;
+        double y0 = ddy + delta_y;
 
-		points_transformed.push_back(QPoint3D(x0, y0, p.getZ()));
-	}
+        points_transformed.push_back(QPoint3D(x0, y0, p.getZ()));
+    }
 
-	//Compute transformation key
-	return points_transformed;
+    //Compute transformation key
+    return points_transformed;
 }
 
+std::map<double, std::vector<Edge>> Algorithms::getMainContourLines(std::vector<Edge> &contours, int contour_interval, double dz)
+{
+    //Return main contours divided into groups by height
+    std::map<double, std::vector<Edge>> contours_main;
 
+    //Height interval for main contour lines
+    int interval_z = dz*contour_interval;
 
+    for (Edge c:contours)
+    {
+        //Height of contour line
+        int contour_z = c.getStart().getZ();
+
+        //Main contour lines
+        if ((contour_z)%interval_z == 0)
+        {
+            if (contours_main.find(contour_z) == contours_main.end())
+                contours_main.insert(std::pair<double, std::vector<Edge>>(contour_z, {c}));
+            else
+                contours_main[contour_z].push_back(c);
+        }
+    }
+    return contours_main;
+}
+
+std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, int contour_interval, double dz, double &threshold)
+{
+    //Get contour lines where height labels needs to be labeled
+    std::vector<Edge> distanced_edges;
+    std::vector<Edge> contours_labeled;
+
+    std::map<double, std::vector<Edge>> main_contours = getMainContourLines(contours, contour_interval, dz);
+
+    for (std::pair<double, std::vector<Edge>> element : main_contours)
+    {
+        distanced_edges = getDistancedEdges(element.second, threshold);
+        contours_labeled.insert(contours_labeled.end(), distanced_edges.begin(), distanced_edges.end());
+    }
+    return contours_labeled;
+}
+
+std::vector<Edge> Algorithms::getDistancedEdges(std::vector<Edge> &edges, double &threshold)
+{
+    //Get vector of edges where labels will be distances by given threshold
+    std::vector<Edge> distanced_edges;
+
+    for (Edge e : edges)
+    {
+        //Center of contour line
+        QPoint3D center_e((e.getStart().x()+e.getEnd().x())/2, (e.getStart().y()+e.getEnd().y())/2);
+
+        //If vector is empty
+        if (distanced_edges.empty())
+            distanced_edges.push_back(e);
+        else
+        {
+            bool noCloseEdge = true;
+            //Comparing distance of label positions
+            for (Edge de : distanced_edges)
+            {
+                    //Center of contour line
+                    QPoint3D center_de((de.getStart().x()+de.getEnd().x())/2, (de.getStart().y()+de.getEnd().y())/2);
+
+                    //Get distance of centers
+                    double distance = Algorithms::pointDist(center_e, center_de);
+
+                    //Push back point if it is far enough
+                    if (distance < threshold)
+                        noCloseEdge = false;
+            }
+            if (noCloseEdge)
+                distanced_edges.push_back(e);
+        }
+    }
+    return distanced_edges;
+}

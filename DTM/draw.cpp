@@ -30,7 +30,7 @@ void Draw::paintEvent(QPaintEvent *event)
     //Draw csv_points
     for (QPoint3D point_3d: csv_points)
     {
-	qp.drawEllipse(point_3d.x()-r,point_3d.y()-r,2*r,2*r);
+    qp.drawEllipse(point_3d.x()-r,point_3d.y()-r,2*r,2*r);
     }
 
     //Draw triangulation
@@ -48,65 +48,69 @@ void Draw::paintEvent(QPaintEvent *event)
     //Draw contour lines
     for (Edge c:contours)
     {
+        //Set color and pen
+        QColor brown("#a52a2a");
+        qp.setPen(QPen(brown,1));
+
         //Get start point, get end point
         QPoint3D s_point = c.getStart();
         QPoint3D e_point = c.getEnd();
 
-        //Center of contour line
-        QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
-
         //Height of contour line
         int zz=s_point.getZ();
 
-	//Height interval for main contour lines
-        int d=dz*k;
+        //Height interval for main contour lines
+            int d=dz*k;
 
-        QColor brown("#a52a2a");
-        //Set pen
-        qp.setPen(QPen(brown,1));
-
-	//Main contour lines
+        //Main contour lines
         if ((zz+z_min)%d == 0)
-        {
-            //Draw main contour line
-            qp.setPen(QPen(brown,2));
-            qp.drawLine(s_point,e_point);
-
-            //Draw description of contour line in 50% procent of events
-            if (a.pointDist(s_point, e_point) > 50)
             {
-                if (rand() % 100 < 50)
-                {
-                    //Angle of contour line
-                    double s = atan((e_point.y()-s_point.y())/ (e_point.x() - s_point.x()));
-                    if  (s < 0)
-                        s+=2*M_PI;
-
-                    //Transform canvas to origin of axes
-                    QTransform t;
-                    t.translate(z.x(), z.y());
-                    t.rotate(s*180/M_PI);
-                    qp.setTransform(t);
-
-                    //Draw hidding line of contour line
-                    qp.setPen(QPen(Qt::white,5));
-                    qp.drawLine(QPoint(5,0),QPoint(25,0));
-                    qp.setPen(QPen(brown,1));
-
-                    //Draw text
-                    qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
-                    qp.resetTransform();
-                }
+                //Draw main contour line
+                qp.setPen(QPen(brown,2));
+                qp.drawLine(s_point,e_point);
             }
-            qp.setPen(QPen(brown,1));
-        }
 
-	//Regular contour line
+        //Regular contour line
         else
             qp.drawLine(s_point,e_point);
         }
 
     std::cout << set_col.QString::toStdString() << std::endl;
+
+    //Draw contour line labes
+    for (Edge c:contours_labeled)
+    {
+        //Get start point, get end point
+        QPoint3D s_point = c.getStart();
+        QPoint3D e_point = c.getEnd();
+
+        //Label offset
+//        double offset = rand()%5 + 1;
+
+        //Center of contour line
+        QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
+
+        //Angle of contour line
+        double s = atan((e_point.y()-s_point.y())/ (e_point.x() - s_point.x()));
+        if  (s < 0)
+            s+=2*M_PI;
+
+        //Transform canvas to origin of axes
+        QTransform t;
+        t.translate(z.x(), z.y());
+        t.rotate(s*180/M_PI);
+        qp.setTransform(t);
+
+        //Draw hidding line of contour line
+        qp.setPen(QPen(Qt::white,5));
+        qp.drawLine(QPoint(5,0),QPoint(25,0));
+        QColor brown("#a52a2a");
+        qp.setPen(QPen(brown,1));
+
+        //Draw text
+        qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
+        qp.resetTransform();
+    }
 
     //Draw slope
     //Koeficient for slope drawing (bits and radians relation)
@@ -174,18 +178,18 @@ void Draw::generateShapes()
 
 void Draw::drawCSVPoints(std::vector<QPoint3D> &points_3d)
 {
-	//Get transformation parameters
-	double trans_x = getTransX();
-	double trans_y = getTransY();
-	double scale = getScale();
-	int delta_x = getDeltaX();
-	int delta_y = getDeltaY();
+    //Get transformation parameters
+    double trans_x = getTransX();
+    double trans_y = getTransY();
+    double scale = getScale();
+    int delta_x = getDeltaX();
+    int delta_y = getDeltaY();
 
-	//Draw vector of points
-	std::vector<QPoint3D> transformedPoints = Algorithms::transformPoints(points_3d, trans_x, trans_y, scale, delta_x, delta_y);
-	Draw::setCSVPoints(transformedPoints);
+    //Draw vector of points
+    std::vector<QPoint3D> transformedPoints = Algorithms::transformPoints(points_3d, trans_x, trans_y, scale, delta_x, delta_y);
+    Draw::setCSVPoints(transformedPoints);
 
-	repaint();
+    repaint();
 }
 
 
