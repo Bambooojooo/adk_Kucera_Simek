@@ -45,6 +45,66 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.drawLine(s_point,e_point);
     }
 
+    if (contoursUp)
+    {
+        //Draw slope
+        for (Triangle t:triangles)
+        {
+            //Get vertices of each triangle
+            QPoint3D p1 = t.getP1();
+            QPoint3D p2 = t.getP2();
+            QPoint3D p3 = t.getP3();
+
+            //Get slope/exposition
+            double val ;
+            int col;
+            if (method == "Slope")
+            {
+                //Transform <0,pi/2> -> <0,255>
+                val = t.getSlope();
+                col = 255 - (255/M_PI) * val;
+            }
+            else if (method == "Exposition")
+            {
+                //Transform <0,2*pi> -> <0,255>
+                val = t.getExposition();
+
+                if (val < 0)
+                    val += 2*M_PI;
+
+                if (val > 0 && val < M_PI)
+                    col = val * (255/M_PI);
+                else
+                    col = -(255/M_PI) * val + 510;
+            }
+
+
+
+            QColor color;
+            if (set_col == "Red")
+                color.setRgb(col, 0, 0);
+            else if (set_col == "Green")
+                color.setRgb(0, col, 0);
+            else if (set_col == "Blue")
+                color.setRgb(0, 0, col);
+            else if (set_col == "Grey")
+                color.setRgb(col, col, col);
+
+            //Set pen and brush
+            qp.setBrush(color);
+            qp.setPen(color);
+
+            //Create polygon for triangle
+            QPolygon pol;
+            pol.push_back(QPoint(p1.x(), p1.y()));
+            pol.push_back(QPoint(p2.x(), p2.y()));
+            pol.push_back(QPoint(p3.x(), p3.y()));
+
+            //Draw triangle
+            qp.drawPolygon(pol);
+        }
+    }
+
     //Draw contour lines
     for (Edge c:contours)
     {
@@ -94,6 +154,7 @@ void Draw::paintEvent(QPaintEvent *event)
             qp.drawLine(s_point,e_point);
         }
 
+
     //Draw contour line labes
     for (Edge c:contours_labeled)
     {
@@ -129,46 +190,68 @@ void Draw::paintEvent(QPaintEvent *event)
         qp.resetTransform();
     }
 
-    //Draw slope
-    //Koeficient for slope drawing (bits and radians relation)
-    double k = 255/M_PI;
-//    QColor color;
-    for (Triangle t:triangles)
+    if (!contoursUp)
     {
-        //Get vertices of each triangle
-        QPoint3D p1 = t.getP1();
-        QPoint3D p2 = t.getP2();
-        QPoint3D p3 = t.getP3();
+        //Draw slope
+        for (Triangle t:triangles)
+        {
+            //Get vertices of each triangle
+            QPoint3D p1 = t.getP1();
+            QPoint3D p2 = t.getP2();
+            QPoint3D p3 = t.getP3();
 
-        //Get slope
-        double slope = t.getSlope();
+            //Get slope/exposition
+            double val ;
+            int col;
+            if (method == "Slope")
+            {
+                //Transform <0,pi/2> -> <0,255>
+                val = t.getSlope();
+                col = 255 - (255/M_PI) * val;
+            }
+            else if (method == "Exposition")
+            {
+                //Transform <0,2*pi> -> <0,255>
+                val = t.getExposition();
 
-        //Convert to color
-        int col = 255 - k * slope;
+                if (val < 0)
+                    val += 2*M_PI;
 
-        QColor color;
-        if (set_col == "Red")
-            color.setRgb(col, 0, 0);
-        else if (set_col == "Green")
-            color.setRgb(0, col, 0);
-        else if (set_col == "Blue")
-            color.setRgb(0, 0, col);
-        else if (set_col == "Grey")
-            color.setRgb(col, col, col);
+                if (val > 0 && val < M_PI)
+                    col = val * (255/M_PI);
+                else
+                    col = -(255/M_PI) * val + 510;
+            }
 
-        //Set pen and brush
-        qp.setBrush(color);
-        qp.setPen(color);
 
-        //Create polygon for triangle
-        QPolygon pol;
-        pol.push_back(QPoint(p1.x(), p1.y()));
-        pol.push_back(QPoint(p2.x(), p2.y()));
-        pol.push_back(QPoint(p3.x(), p3.y()));
 
-        //Draw triangle
-        qp.drawPolygon(pol);
+            QColor color;
+            if (set_col == "Red")
+                color.setRgb(col, 0, 0);
+            else if (set_col == "Green")
+                color.setRgb(0, col, 0);
+            else if (set_col == "Blue")
+                color.setRgb(0, 0, col);
+            else if (set_col == "Grey")
+                color.setRgb(col, col, col);
+
+            //Set pen and brush
+            qp.setBrush(color);
+            qp.setPen(color);
+
+            //Create polygon for triangle
+            QPolygon pol;
+            pol.push_back(QPoint(p1.x(), p1.y()));
+            pol.push_back(QPoint(p2.x(), p2.y()));
+            pol.push_back(QPoint(p3.x(), p3.y()));
+
+            //Draw triangle
+            qp.drawPolygon(pol);
+        }
     }
+
+
+
 }
 
 void Draw::mousePressEvent(QMouseEvent *event)

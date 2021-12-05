@@ -33,7 +33,7 @@ public:
     std::vector<QPoint3D> generateRandomPoints(QSize &size_canvas, int n);
     std::vector<QPoint3D> generateSaddle(std::vector<QPoint3D> &points);
     std::vector<QPoint3D> generateRidge(std::vector<QPoint3D> &points);
-    std::vector<QPoint3D> generateRest(std::vector<QPoint3D> &points);
+//    std::vector<QPoint3D> generateRest(std::vector<QPoint3D> &points);
     static QPoint3D getContourPoint(QPoint3D &p1, QPoint3D &p2, double z);
     static std::vector<Edge> getContourLines(std::vector<Edge> &dt, double zmin, double zmax, int dz);
     static std::map<double, std::vector<Edge>> getMainContourLines(std::vector<Edge> &contours, int contour_interval, double dz);

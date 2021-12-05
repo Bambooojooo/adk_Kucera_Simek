@@ -155,7 +155,13 @@ void Widget::on_pushButton_4_clicked()
         //Set triangles
         ui->Canvas->setTriangles(triangles);
         QString col = ui->comboBox_2->currentText();
+        QString method = ui->comboBox_3->currentText();
+        bool contoursUp = ui->checkBox->isChecked();
+        ui->Canvas->setAnalyzeMethod(method);
         ui->Canvas->setColor(col);
+        ui->Canvas->setContourUp(contoursUp);
+
+
 
         repaint();
     }
@@ -189,8 +195,8 @@ void Widget::on_pushButton_7_clicked()
         points = a.generatePile(points);
     else if (shape == "Ridge")
         points = a.generateRidge(points);
-    else if (shape == "Rest")
-        points = a.generateRest(points);
+//    else if (shape == "Rest")
+//        points = a.generateRest(points);
 
     ui->Canvas->setPoints(points);
     points.pop_back();
@@ -283,5 +289,38 @@ void Widget::on_pushButton_Load_clicked()
         //Draw points
         ui->Canvas->drawCSVPoints(points_3d);
     }
+}
+
+
+void Widget::on_pushButton_6_clicked()
+{
+    //Draw Exposition
+    std::vector<Edge> dt = ui->Canvas->getDT();
+
+    //Is the triangulation not empty?
+    if (dt.size() > 0)
+    {
+        Algorithms a;
+        //Analyze DTM
+        std::vector<Triangle> triangles = a.analyzeDTM(dt);
+
+        //Set triangles
+        ui->Canvas->setTriangles(triangles);
+        QString col = ui->comboBox_2->currentText();
+        ui->Canvas->setColor(col);
+
+        repaint();
+    }
+}
+
+
+void Widget::on_checkBox_clicked()
+{
+
+    bool contoursUp = ui->checkBox->isChecked();
+
+    ui->Canvas->setContourUp(contoursUp);
+
+    repaint();
 }
 

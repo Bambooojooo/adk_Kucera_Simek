@@ -27,6 +27,8 @@ private:
     double trans_x, trans_y;
     int delta_x, delta_y;
     QString set_col;
+    QString method;
+    bool contoursUp;
 
 public:
     //Drawing
@@ -74,6 +76,8 @@ public:
     void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
     void setDeltas(int &delta_x_, int &delta_y_){delta_x = delta_x_; delta_y = delta_y_;}
     void setContoursLabeled(std::vector<Edge> &contours_labeled_){contours_labeled=contours_labeled_;}
+    void setAnalyzeMethod(QString method_){method = method_;}
+    void setContourUp(bool contoursUp_ ) {contoursUp = contoursUp_;}
 
 signals:
 

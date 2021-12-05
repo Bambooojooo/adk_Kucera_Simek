@@ -62,11 +62,6 @@
        </item>
        <item>
         <property name="text">
-         <string>Rest</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>Ridge</string>
         </property>
        </item>
@@ -148,6 +143,13 @@
       <widget class="QLineEdit" name="lineEdit_4"/>
      </item>
      <item>
+      <widget class="QCheckBox" name="checkBox">
+       <property name="text">
+        <string>Contours up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_3">
        <property name="text">
         <string>Create contours</string>
@@ -170,7 +172,7 @@
      <item>
       <widget class="QLabel" name="label_6">
        <property name="text">
-        <string>Color of slope</string>
+        <string>Color of slope:</string>
        </property>
       </widget>
      </item>
@@ -199,9 +201,30 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Type of analyze:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboBox_3">
+       <item>
+        <property name="text">
+         <string>Slope</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Exposition</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_4">
        <property name="text">
-        <string>Draw Slope</string>
+        <string>Analyze DMT</string>
        </property>
       </widget>
      </item>
