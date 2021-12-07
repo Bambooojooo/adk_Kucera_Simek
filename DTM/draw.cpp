@@ -211,7 +211,7 @@ void Draw::paintEvent(QPaintEvent *event)
             {
 
                 val = t.getSlope() - minSlope;
-                val = val*((0.9*M_PI/2)/(maxSlope-minSlope));
+                val = val*((M_PI/2)/(maxSlope-minSlope));
                 //Transform <0,pi/2> -> <0,255>
                 col =  (255/(M_PI/2)) * val;
             }
