@@ -53,6 +53,16 @@ private slots:
 
     void on_checkBox_clicked();
 
+    void on_checkBox_2_clicked();
+
+    void on_checkBox_2_stateChanged(int arg1);
+
+    void on_save_clicked();
+
+    void on_save_canvas_clicked();
+
+    void on_dmtUP_clicked();
+
 private:
     Ui::Widget *ui;
 };

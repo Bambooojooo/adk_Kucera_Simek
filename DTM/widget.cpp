@@ -324,3 +324,25 @@ void Widget::on_checkBox_clicked()
     repaint();
 }
 
+
+
+
+
+void Widget::on_save_canvas_clicked()
+{
+
+    QString path(QFileDialog::getSaveFileName(this, tr("Save Canvas"), tr("Canvas"), tr("PNG Files (*.png)")));
+    ui->Canvas->grab().save(path);
+}
+
+
+
+void Widget::on_dmtUP_clicked()
+{
+    bool dmtUp = ui->dmtUP->isChecked();
+
+    ui->Canvas->setDmtUp(dmtUp);
+
+    repaint();
+}
+

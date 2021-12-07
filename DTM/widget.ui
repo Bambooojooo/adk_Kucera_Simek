@@ -222,6 +222,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QCheckBox" name="dmtUP">
+       <property name="text">
+        <string>DMT up</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton_4">
        <property name="text">
         <string>Analyze DMT</string>
@@ -274,6 +281,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="save_canvas">
+       <property name="text">
+        <string>Save</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

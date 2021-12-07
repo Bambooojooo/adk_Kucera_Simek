@@ -413,13 +413,9 @@ std::vector<Triangle> Algorithms::analyzeDTM(std::vector<Edge> &dt)
 
 std::vector<QPoint3D> Algorithms::generatePile(std::vector<QPoint3D> &points)
 {
+    //Generate pile by z = x^2 + y^2 equation
 
-//    std::vector<QPoint3D> points;
-    //Coordinates of random point
-//    double height, width;
     int n= points.size();
-    double z_top = 1000;
-    double z_bottom = 0;
 
     //Compute z coordinates
     double z;
@@ -427,8 +423,6 @@ std::vector<QPoint3D> Algorithms::generatePile(std::vector<QPoint3D> &points)
     {
         double dh = points[i].y() - points[n-1].y();
         double dw = points[i].x() - points[n-1].x();
-
-//        double d = sqrt(dw*dw + dh*dh);
 
         z = - dh*dh - dw*dw + rand() % 10;
         points[i].setZ(z/200+1000);
@@ -448,6 +442,7 @@ double Algorithms::pointDist(QPoint3D &p1, QPoint3D &p2)
 
 std::vector<QPoint3D> Algorithms::generateRandomPoints(QSize &size_canvas, int n)
 {
+    //Generate vector of random points, last point in vector is centre of points
     std::vector<QPoint3D> points;
 
     double height, width;
@@ -459,8 +454,6 @@ std::vector<QPoint3D> Algorithms::generateRandomPoints(QSize &size_canvas, int n
         width = rand() % size_canvas.width();
 
         points.push_back(QPoint3D(width, height));
-
-
 
         tw+=width;
         th+=height;
@@ -476,17 +469,16 @@ std::vector<QPoint3D> Algorithms::generateRandomPoints(QSize &size_canvas, int n
 
 std::vector<QPoint3D> Algorithms::generateSaddle(std::vector<QPoint3D> &points)
 {
-    int n= points.size();
-//    double z_top = 1000;
+    //Generate saddle by z=x*y equation
 
-    double z;
+    int n= points.size();
+
     for (int i = 0; i<n; i+=1)
     {
         double y = points[i].y() - points[n-1].y();
         double x = points[i].x() - points[n-1].x();
 
-        z = (x*y)/250 + 500;
-        z += rand() % 5;
+        double z = (x*y)/250 + 500 + rand() % 5;
 
         points[i].setZ(z);
     }
@@ -495,6 +487,7 @@ std::vector<QPoint3D> Algorithms::generateSaddle(std::vector<QPoint3D> &points)
 
 int Algorithms::findMaxZ(std::vector<QPoint3D> &points)
 {
+    //Find maximum height from points
     int max=-1e6;
 
     for (QPoint3D p : points)
@@ -506,6 +499,7 @@ int Algorithms::findMaxZ(std::vector<QPoint3D> &points)
 }
 int Algorithms::findMinZ(std::vector<QPoint3D> &points)
 {
+    //Find minimum height from points
     int min=1e6;
 
     for (QPoint3D p : points)
@@ -518,60 +512,20 @@ int Algorithms::findMinZ(std::vector<QPoint3D> &points)
 
 std::vector<QPoint3D> Algorithms::generateRidge(std::vector<QPoint3D> &points)
 {
+    //Generate cylinder and pick up him by x coordinate
     int n= points.size();
 
-    double z;
+
     for (int i = 0; i<n; i+=1)
     {
         double y = points[i].y() - points[n-1].y();
-        z = sqrt((points[n-1].y()+40)*(points[n-1].y()+40) - y*y) + points[i].x() + rand() % 10;
-//        double x = points[i].x() - points[n-1].x();
-
-//        z = (x*y)/250 + 500;
-//        z += rand() % 10;
-        std::cout << "z " << z << std::endl;
+        //Height of cylinder
+        double z = sqrt((points[n-1].y()+40)*(points[n-1].y()+40) - y*y) + points[i].x() + rand() % 10;
 
         points[i].setZ(z);
     }
     return points;
 }
-
-//std::vector<QPoint3D> Algorithms::generateRest(std::vector<QPoint3D> &points)
-//{
-//    int n= points.size();
-
-//    QPoint3D qmax = *max_element(points.begin(), points.end(), sortByX());
-//    QPoint3D qmin = *min_element(points.begin(), points.end(), sortByX());
-
-//    double rangex = (qmax.x()-qmin.x())/3;
-//    double rangey = (qmax.y()-qmin.y())/3;
-
-//    int std = 10;
-
-//    double z;
-//    for (int i = 0; i<n; i+=1)
-//    {
-//        double x = points[i].x() - points[n-1].x();
-//        double y = points[i].y() - points[n-1].y();
-
-////        if (points[i].x() < qmin.x() + rangex)
-////            z = sqrt((points[n-1].y()+40)*(points[n-1].y()+40) - y*y) + points[i].x() + rand() % std;
-
-////        else if ((points[i].x() > qmin.x() + rangex) && (points[i].x() < qmin.x() + 2*rangex))
-////            z = sqrt((points[n-1].y()+40)*(points[n-1].y()+40) - y*y) + points[n-1].x() + rand() % std;
-
-////        else if ((points[i].x() > qmin.x() + 2*rangex) && (points[i].x() < qmin.x() + 3*rangex))
-////            z =sqrt((points[n-1].y()+40)*(points[n-1].y()+40) - y*y) + points[i].x() + rand() % std;
-////        z = x*x + y*y + x*y*y + x*x*y + sin(x) * sin(y);
-//        z=sin(x) + sin(y) ;
-////        z=z/200000+500;
-//        z=z*500+500;
-
-
-//        points[i].setZ(z);
-//    }
-//    return points;
-//}
 
 std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y)
 {

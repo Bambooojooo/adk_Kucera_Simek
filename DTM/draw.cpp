@@ -33,16 +33,20 @@ void Draw::paintEvent(QPaintEvent *event)
     qp.drawEllipse(point_3d.x()-r,point_3d.y()-r,2*r,2*r);
     }
 
-    //Draw triangulation
-    for(Edge e : dt)
+//    //Draw triangulation
+    double max = 200;
+    if (!dmtUp)
     {
-        //Get start point, get end point
-        QPoint3D s_point = e.getStart();
-        QPoint3D e_point = e.getEnd();
+        for(Edge e : dt)
+        {
+            //Get start point, get end point
+            QPoint3D s_point = e.getStart();
+            QPoint3D e_point = e.getEnd();
 
-        //Draw line
-        qp.setPen(QPen(Qt::green, 1));
-        qp.drawLine(s_point,e_point);
+            //Draw line
+            qp.setPen(QPen(Qt::black, 0.5));
+            qp.drawLine(s_point,e_point);
+        }
     }
 
     if (contoursUp)
@@ -56,7 +60,7 @@ void Draw::paintEvent(QPaintEvent *event)
             QPoint3D p3 = t.getP3();
 
             //Get slope/exposition
-            double val ;
+            double val;
             int col;
             if (method == "Slope")
             {
@@ -72,10 +76,12 @@ void Draw::paintEvent(QPaintEvent *event)
                 if (val < 0)
                     val += 2*M_PI;
 
-                if (val > 0 && val < M_PI)
-                    col = val * (255/M_PI);
-                else
-                    col = -(255/M_PI) * val + 510;
+                //Transform <0,2*pi> -> <0,200>
+                col = -(max/M_PI)*fabs(val - M_PI) + max;
+                //Invert color
+                col = 255 - col;
+
+
             }
 
 
@@ -122,8 +128,6 @@ void Draw::paintEvent(QPaintEvent *event)
         //Height interval for main contour lines
         int d=dz*k;
 
-//        qp.drawLine(s_point,e_point);
-
         //Main contour lines
         if ((zz)%d == 0)
             {
@@ -137,7 +141,6 @@ void Draw::paintEvent(QPaintEvent *event)
             qp.drawLine(s_point,e_point);
     }
 
-    std::cout << set_col.QString::toStdString() << std::endl;
 
     //Main contour lines
     for (Edge c:contours_main)
@@ -205,22 +208,25 @@ void Draw::paintEvent(QPaintEvent *event)
             int col;
             if (method == "Slope")
             {
-                //Transform <0,pi/2> -> <0,255>
+
                 val = t.getSlope();
+                //Transform <0,pi/2> -> <0,255>
                 col = 255 - (255/M_PI) * val;
             }
             else if (method == "Exposition")
             {
-                //Transform <0,2*pi> -> <0,255>
+
                 val = t.getExposition();
 
                 if (val < 0)
                     val += 2*M_PI;
 
-                if (val > 0 && val < M_PI)
-                    col = val * (255/M_PI);
-                else
-                    col = -(255/M_PI) * val + 510;
+                //Transform <0,2*pi> -> <0,200>
+                col = -(max/M_PI)*fabs(val - M_PI) + max;
+                //Invert color
+                col = 255 - col;
+
+
             }
 
 
@@ -250,7 +256,19 @@ void Draw::paintEvent(QPaintEvent *event)
         }
     }
 
+    if (dmtUp)
+    {
+        for(Edge e : dt)
+        {
+            //Get start point, get end point
+            QPoint3D s_point = e.getStart();
+            QPoint3D e_point = e.getEnd();
 
+            //Draw line
+            qp.setPen(QPen(Qt::black, 0.5));
+            qp.drawLine(s_point,e_point);
+        }
+    }
 
 }
 

@@ -29,6 +29,8 @@ private:
     QString set_col;
     QString method;
     bool contoursUp;
+    bool invert;
+    bool dmtUp = false;
 
 public:
     //Drawing
@@ -78,6 +80,8 @@ public:
     void setContoursLabeled(std::vector<Edge> &contours_labeled_){contours_labeled=contours_labeled_;}
     void setAnalyzeMethod(QString method_){method = method_;}
     void setContourUp(bool contoursUp_ ) {contoursUp = contoursUp_;}
+    void setInvert(bool invert_ ) {invert = invert_;}
+    void setDmtUp(bool dmtUp_) {dmtUp = dmtUp_;}
 
 signals:
 
