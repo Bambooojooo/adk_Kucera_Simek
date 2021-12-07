@@ -160,6 +160,10 @@ void Widget::on_pushButton_4_clicked()
         ui->Canvas->setAnalyzeMethod(method);
         ui->Canvas->setColor(col);
         ui->Canvas->setContourUp(contoursUp);
+        double max = a.getMaxSlope(triangles);
+        double min = a.getMinSlope(triangles);
+        ui->Canvas->setMinSlope(min);
+        ui->Canvas->setMaxSlope(max);
 
 
 

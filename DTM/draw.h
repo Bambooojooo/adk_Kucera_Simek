@@ -31,6 +31,8 @@ private:
     bool contoursUp;
     bool invert;
     bool dmtUp = false;
+    double maxSlope;
+    double minSlope;
 
 public:
     //Drawing
@@ -82,6 +84,8 @@ public:
     void setContourUp(bool contoursUp_ ) {contoursUp = contoursUp_;}
     void setInvert(bool invert_ ) {invert = invert_;}
     void setDmtUp(bool dmtUp_) {dmtUp = dmtUp_;}
+    void setMaxSlope(double max) {maxSlope = max;}
+    void setMinSlope(double min) {minSlope = min;}
 
 signals:
 

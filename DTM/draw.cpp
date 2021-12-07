@@ -65,8 +65,9 @@ void Draw::paintEvent(QPaintEvent *event)
             if (method == "Slope")
             {
                 //Transform <0,pi/2> -> <0,255>
-                val = t.getSlope();
-                col = 255 - (255/M_PI) * val;
+                val = t.getSlope() - minSlope;
+                val = val*((M_PI/2)/(maxSlope-minSlope));
+                col = (255/(M_PI/2)) * val;
             }
             else if (method == "Exposition")
             {
@@ -209,9 +210,10 @@ void Draw::paintEvent(QPaintEvent *event)
             if (method == "Slope")
             {
 
-                val = t.getSlope();
+                val = t.getSlope() - minSlope;
+                val = val*((0.9*M_PI/2)/(maxSlope-minSlope));
                 //Transform <0,pi/2> -> <0,255>
-                col = 255 - (255/M_PI) * val;
+                col =  (255/(M_PI/2)) * val;
             }
             else if (method == "Exposition")
             {

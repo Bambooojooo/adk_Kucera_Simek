@@ -631,3 +631,28 @@ std::vector<Edge> Algorithms::getDistancedEdges(std::vector<Edge> &edges, double
     }
     return distanced_edges;
 }
+
+double Algorithms::getMinSlope(std::vector<Triangle> &triangles)
+{
+    double min = 10e16;
+
+    for (Triangle t:triangles)
+    {
+        if (t.getSlope() < min)
+            min = t.getSlope();
+    }
+
+    return min;
+}
+double Algorithms::getMaxSlope(std::vector<Triangle> &triangles)
+{
+    double max = 10e-16;
+
+    for (Triangle t:triangles)
+    {
+        if (t.getSlope() > max)
+            max = t.getSlope();
+    }
+
+    return max;
+}

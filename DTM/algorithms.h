@@ -41,6 +41,8 @@ public:
     static std::vector<Edge> getLabeledContours(std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &threshold);
 
     static std::vector<Edge> getDistancedEdges(std::vector<Edge> &edges, double &threshold);
+    static double getMinSlope(std::vector<Triangle> &triangles);
+    static double getMaxSlope(std::vector<Triangle> &triangles);
 };
 
 #endif // ALGORITHMS_H
