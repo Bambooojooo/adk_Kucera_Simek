@@ -579,7 +579,7 @@ std::map<double, std::vector<Edge>> Algorithms::getMainContourLines(std::vector<
     return contours_main;
 }
 
-std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &threshold)
+std::vector<Edge> Algorithms::getLabeledContours(std::vector<QPoint3D> &points, std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &distance_threshold, double &length_threshold, double &offset)
 {
     //Get contour lines where height labels needs to be labeled
     std::vector<Edge> distanced_edges;
@@ -589,44 +589,67 @@ std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, st
 
     for (std::pair<double, std::vector<Edge>> element : main_contours)
     {
+        //Append main conture lines for drawing
         contours_main.insert(contours_main.begin(), element.second.begin(), element.second.end());
-        distanced_edges = getDistancedEdges(element.second, threshold);
-        contours_labeled.insert(contours_labeled.end(), distanced_edges.begin(), distanced_edges.end());
+
+        //Separate multiple contour lines of the same height to single continuous contour lines
+        std::vector<std::vector<Edge>> contours_separated = chainEdges(element.second);
+
+        //Process single contour lines to get labels
+        for (std::vector<Edge> contour_line:contours_separated)
+        {
+            if (!contour_line.empty())
+            {
+                //Get distanced edges for labeling
+                distanced_edges = getDistancedEdges(contour_line, distance_threshold, length_threshold, offset);
+
+                //Append those label edges
+                contours_labeled.insert(contours_labeled.end(), distanced_edges.begin(), distanced_edges.end());
+            }
+        }
     }
     return contours_labeled;
 }
 
-std::vector<Edge> Algorithms::getDistancedEdges(std::vector<Edge> &edges, double &threshold)
+std::vector<Edge> Algorithms::getDistancedEdges(std::vector<Edge> &edges, double &distance_threshold, double &length_threshold, double &offset)
 {
     //Get vector of edges where labels will be distances by given threshold
     std::vector<Edge> distanced_edges;
+    int n = edges.size();
+
+    distanced_edges.push_back(edges[rand()%n]);
 
     for (Edge e : edges)
     {
-        //Center of contour line
-        QPoint3D center_e((e.getStart().x()+e.getEnd().x())/2, (e.getStart().y()+e.getEnd().y())/2);
+        //Get start point, get end point
+        QPoint3D s_point = e.getStart();
+        QPoint3D e_point = e.getEnd();
 
-        //If vector is empty
-        if (distanced_edges.empty())
-            distanced_edges.push_back(e);
-        else
+        //If edge length is longer than given offset
+        if (Algorithms::pointDist(s_point, e_point) > length_threshold)
         {
-            bool noCloseEdge = true;
-            //Comparing distance of label positions
-            for (Edge de : distanced_edges)
+            //Center of contour line
+            QPoint3D center_e((e.getStart().x()+e.getEnd().x())/2, (e.getStart().y()+e.getEnd().y())/2);
+
+            if (rand()%100 < 10)
             {
-                    //Center of contour line
-                    QPoint3D center_de((de.getStart().x()+de.getEnd().x())/2, (de.getStart().y()+de.getEnd().y())/2);
+                bool noCloseEdge = true;
+                //Comparing distance of label positions
+                for (Edge de : distanced_edges)
+                {
+                        //Center of contour line
+                        QPoint3D center_de((de.getStart().x()+de.getEnd().x())/2, (de.getStart().y()+de.getEnd().y())/2);
 
-                    //Get distance of centers
-                    double distance = Algorithms::pointDist(center_e, center_de);
+                        //Get distance of centers
+                        double distance = Algorithms::pointDist(center_e, center_de);
 
-                    //Push back point if it is far enough
-                    if (distance < threshold)
-                        noCloseEdge = false;
+                        //Push back point if it is far enough
+                        if (distance < distance_threshold+offset)
+                            noCloseEdge = false;
+                }
+                if (noCloseEdge)
+                    distanced_edges.push_back(e);
             }
-            if (noCloseEdge)
-                distanced_edges.push_back(e);
         }
     }
     return distanced_edges;
@@ -655,4 +678,72 @@ double Algorithms::getMaxSlope(std::vector<Triangle> &triangles)
     }
 
     return max;
+}
+
+std::vector<std::vector<Edge>> Algorithms::chainEdges(std::vector<Edge> &edges)
+{
+    //Groups coresponding contour lines
+    bool connection_segment_exists;
+    std::list<int> add_ids;
+    std::vector<std::vector<Edge>> edges_chained;
+    std::list<std::vector<Edge>> edge_list;
+    std::vector<std::vector<Edge>> edge_vector;
+
+    for (Edge e:edges)
+    {
+        //Vector is empty yet
+        if (edge_vector.empty())
+            edge_vector.push_back({e});
+
+        else
+        {
+            //Iterate trough all potential separated contours (chains)
+            for (int i=0; i<edge_vector.size(); i++)
+            {
+                //Bool determining wether we want add edge to newly created separate contour line (chain) in the list or add it to already existing chain.
+                //True => create new chain and add edge to it; False => add edge to existing chain
+                connection_segment_exists = false;
+
+                //Go through every edge (segment) of contour line (chain)
+                for (Edge segment:edge_vector[i])
+                {
+                    //If edge connects to another edge save iterator of this particular contour (chain)
+                    if (e.isEdgeConnection(segment) && !connection_segment_exists)
+                    {
+                        connection_segment_exists = true;
+                        add_ids.push_back(i);
+                        break;
+                    }
+                }
+            }
+            //No iterator stored, creating new contour
+            if (add_ids.size() == 0)
+                edge_vector.push_back({e});
+
+            //Only one iterator stored, appending to a contour line
+            else if (add_ids.size() == 1)
+            {
+                edge_vector[add_ids.front()].push_back(e);
+                add_ids.pop_front();
+            }
+            //More than one iterator saved, appending to a contour line and merging with other contour lines
+            else
+            {
+                //Append edge to first found contour and remove saved iterator of this contour
+                int main_merge_contour = add_ids.front();
+                add_ids.pop_front();
+                edge_vector[main_merge_contour].push_back(e);
+
+
+                //Process the rest of iterators to join contours with the frist one
+                while (!add_ids.empty())
+                {
+                    edge_vector[main_merge_contour].insert(edge_vector[main_merge_contour].end(), edge_vector[add_ids.front()].begin(), edge_vector[add_ids.front()].end());
+                    edge_vector[add_ids.front()].clear();
+                    add_ids.pop_front();
+                }
+            }
+        }
+    }
+    return edge_vector;
 }

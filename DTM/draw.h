@@ -13,7 +13,7 @@ class Draw : public QWidget
     Q_OBJECT
 private:
     std::vector<QPoint3D> points;
-    std::vector<QPoint3D> csv_points;
+//    std::vector<QPoint3D> csv_points;
     std::vector<Edge> dt;
     std::vector<Edge> contours;
     std::vector<Edge> contours_main;
@@ -39,16 +39,16 @@ public:
     explicit Draw(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event);
     void mousePressEvent(QMouseEvent *event);
-    void clearPoints(){points.clear(); csv_points.clear(); contours_main.clear();}
+    void clearPoints(){points.clear();} // csv_points.clear();}
     void clearDT(){dt.clear();}
-    void clearContours(){contours.clear(); contours_labeled.clear();}
+    void clearContours(){contours.clear(); contours_labeled.clear(); contours_main.clear();}
     void clearTriangles(){triangles.clear();}
     void generateShapes();
     void drawCSVPoints(std::vector<QPoint3D> &points_3d);
 
     //Getters
     std::vector<QPoint3D> getPoints(){return points;}
-    std::vector<QPoint3D> getCSVPoints(){return csv_points;}
+//    std::vector<QPoint3D> getCSVPoints(){return csv_points;}
     std::vector<Edge> getDT(){return dt;}    
     std::vector<Edge> getContours(){return contours;}
     std::vector<Edge> getContoursMain(){return contours_main;}
@@ -75,7 +75,7 @@ public:
     void setz_min(int zmin_){z_min=zmin_;}
     void setz_max(int z_max_){z_max=z_max_;}
     void setColor(QString &color_){set_col = color_;}
-    void setCSVPoints(std::vector<QPoint3D> &csv_points_){csv_points = csv_points_;}
+    void setCSVPoints(std::vector<QPoint3D> &csv_points){points.insert(points.end(), csv_points.begin(), csv_points.end());}
     void setScale(double &scale_){scale = scale_;}
     void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
     void setDeltas(int &delta_x_, int &delta_y_){delta_x = delta_x_; delta_y = delta_y_;}

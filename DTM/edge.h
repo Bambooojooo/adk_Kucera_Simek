@@ -20,9 +20,9 @@ public:
         return (s==e2.getStart()) && (e == e2.getEnd());
     }
 
-    bool isNext(const Edge &e2)
+    bool isEdgeConnection(const Edge &e2)
     {
-        return (e == e2.getStart());
+        return (e == e2.getStart()) || (e == e2.getEnd()) || (s == e2.getStart())  || (s == e2.getEnd());
     }
 };
 

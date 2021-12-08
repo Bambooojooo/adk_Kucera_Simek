@@ -42,35 +42,26 @@ void Widget::on_pushButton_2_clicked()
 void Widget::on_pushButton_clicked()
 {
     //Get points
-    std::vector<QPoint3D> clicked_points = ui->Canvas->getPoints();
-    std::vector<QPoint3D> csv_points = ui->Canvas->getCSVPoints();
-
-    //Concatenate point vectors
-    std::vector<QPoint3D> points;
-    points.insert(points.begin(), clicked_points.begin(), clicked_points.end());
-    points.insert(points.end(), csv_points.begin(), csv_points.end());
+    std::vector<QPoint3D> points = ui->Canvas->getPoints();
 
     //Create DT
-    Algorithms a;
-
-    //Process points
     if (points.size() > 0)
     {
-    std::vector<Edge> dt = a.dT(points);
+        std::vector<Edge> dt = Algorithms::dT(points);
 
-    //Set DT
-    ui->Canvas->setDT(dt);
+        //Set DT
+        ui->Canvas->setDT(dt);
 
-    repaint();
+        repaint();
     }
-    //No points
+        //No points
     else
     {
-    QMessageBox msg;
-    msg.setText("No points to process. Click them or load them first!");
-    msg.setStandardButtons(QMessageBox::Cancel);
-    msg.setDefaultButton(QMessageBox::Cancel);
-    int ret = msg.exec();
+        QMessageBox msg;
+        msg.setText("No points to process. Click them or load them first!");
+        msg.setStandardButtons(QMessageBox::Cancel);
+        msg.setDefaultButton(QMessageBox::Cancel);
+        int ret = msg.exec();
     }
 }
 
@@ -98,8 +89,12 @@ void Widget::on_lineEdit_3_editingFinished()
 
 void Widget::on_pushButton_3_clicked()
 {
-    //Create contours
+     //Create contours
     std::vector<Edge> dt = ui->Canvas->getDT();
+    std::vector<Triangle> triangles = ui->Canvas->getTriangles();
+
+    //Get points
+    std::vector<QPoint3D> points = ui->Canvas->getPoints();
 
     //Is the triangulation not empty?
     if (dt.size() > 0)
@@ -109,13 +104,15 @@ void Widget::on_pushButton_3_clicked()
         int dz = ui->lineEdit_3->text().toInt();
         int contour_interval = ui->lineEdit_4->text().toInt();
         double label_distance_threshold = 150;
+        double edge_length_threshold = 6;
+        double label_offset = 0; //rand()%100;
 
         //Create contours
         std::vector<Edge> contours = Algorithms::getContourLines(dt, z_min, z_max, dz);
 
         //Get main labeled contour lines
         std::vector<Edge> contours_main;
-        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(contours, contours_main, contour_interval, dz, label_distance_threshold);
+        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(points, contours, contours_main, contour_interval, dz, label_distance_threshold, edge_length_threshold, label_offset);
 
         ui->Canvas->setContoursMain(contours_main);
         ui->Canvas->setContoursLabeled(contours_labeled);
@@ -148,9 +145,8 @@ void Widget::on_pushButton_4_clicked()
     //Is the triangulation not empty?
     if (dt.size() > 0)
     {
-        Algorithms a;
         //Analyze DTM
-        std::vector<Triangle> triangles = a.analyzeDTM(dt);
+        std::vector<Triangle> triangles = Algorithms::analyzeDTM(dt);
 
         //Set triangles
         ui->Canvas->setTriangles(triangles);
@@ -160,8 +156,8 @@ void Widget::on_pushButton_4_clicked()
         ui->Canvas->setAnalyzeMethod(method);
         ui->Canvas->setColor(col);
         ui->Canvas->setContourUp(contoursUp);
-        double max = a.getMaxSlope(triangles);
-        double min = a.getMinSlope(triangles);
+        double max = Algorithms::getMaxSlope(triangles);
+        double min = Algorithms::getMinSlope(triangles);
         ui->Canvas->setMinSlope(min);
         ui->Canvas->setMaxSlope(max);
 
@@ -191,22 +187,21 @@ void Widget::on_pushButton_7_clicked()
 
     QSize size = ui->Canvas->size();
 
-    Algorithms a;
-    std::vector<QPoint3D> points = a.generateRandomPoints(size, n_points);
+    std::vector<QPoint3D> points = Algorithms::generateRandomPoints(size, n_points);
     if (shape == "Saddle")
-        points = a.generateSaddle(points);
+        points = Algorithms::generateSaddle(points);
     else if (shape == "Pile")
-        points = a.generatePile(points);
+        points = Algorithms::generatePile(points);
     else if (shape == "Ridge")
-        points = a.generateRidge(points);
+        points = Algorithms::generateRidge(points);
 //    else if (shape == "Rest")
 //        points = a.generateRest(points);
 
     ui->Canvas->setPoints(points);
     points.pop_back();
 
-    int max = a.findMaxZ(points);
-    int min = a.findMinZ(points);
+    int max = Algorithms::findMaxZ(points);
+    int min = Algorithms::findMinZ(points);
 
 
 //    ui->Canvas->setz_max(max);
@@ -295,7 +290,6 @@ void Widget::on_pushButton_Load_clicked()
     }
 }
 
-
 void Widget::on_pushButton_6_clicked()
 {
     //Draw Exposition
@@ -304,9 +298,8 @@ void Widget::on_pushButton_6_clicked()
     //Is the triangulation not empty?
     if (dt.size() > 0)
     {
-        Algorithms a;
         //Analyze DTM
-        std::vector<Triangle> triangles = a.analyzeDTM(dt);
+        std::vector<Triangle> triangles = Algorithms::analyzeDTM(dt);
 
         //Set triangles
         ui->Canvas->setTriangles(triangles);
@@ -317,10 +310,8 @@ void Widget::on_pushButton_6_clicked()
     }
 }
 
-
 void Widget::on_checkBox_clicked()
 {
-
     bool contoursUp = ui->checkBox->isChecked();
 
     ui->Canvas->setContourUp(contoursUp);
@@ -328,18 +319,11 @@ void Widget::on_checkBox_clicked()
     repaint();
 }
 
-
-
-
-
 void Widget::on_save_canvas_clicked()
 {
-
     QString path(QFileDialog::getSaveFileName(this, tr("Save Canvas"), tr("Canvas"), tr("PNG Files (*.png)")));
     ui->Canvas->grab().save(path);
 }
-
-
 
 void Widget::on_dmtUP_clicked()
 {

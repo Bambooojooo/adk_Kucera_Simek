@@ -16,8 +16,8 @@ void Draw::paintEvent(QPaintEvent *event)
     QPainter qp(this);
     qp.begin(this);
 
-    //Draw clicked points
-    int r=4;
+    //Draw points
+    int r=2;
     QPolygon pol;
     Algorithms a;
 
@@ -25,12 +25,6 @@ void Draw::paintEvent(QPaintEvent *event)
     {
         qp.drawEllipse(points[i].x()-r,points[i].y()-r,2*r,2*r);
         pol.append(QPoint(points[i].x(), points[i].y()));
-    }
-
-    //Draw csv_points
-    for (QPoint3D point_3d: csv_points)
-    {
-    qp.drawEllipse(point_3d.x()-r,point_3d.y()-r,2*r,2*r);
     }
 
 //    //Draw triangulation
@@ -44,7 +38,7 @@ void Draw::paintEvent(QPaintEvent *event)
             QPoint3D e_point = e.getEnd();
 
             //Draw line
-            qp.setPen(QPen(Qt::black, 0.5));
+            qp.setPen(QPen(Qt::black, 0.15));
             qp.drawLine(s_point,e_point);
         }
     }
@@ -129,21 +123,12 @@ void Draw::paintEvent(QPaintEvent *event)
         //Height interval for main contour lines
         int d=dz*k;
 
-        //Main contour lines
-        if ((zz)%d == 0)
-            {
-                //Draw main contour line
-                qp.setPen(QPen(brown,2));
-                qp.drawLine(s_point,e_point);
-            }
-
         //Regular contour line
-        else
-            qp.drawLine(s_point,e_point);
+        qp.drawLine(s_point,e_point);
     }
 
 
-    //Main contour lines
+    //Draw main contour lines
     for (Edge c:contours_main)
         {
             //Defining QColor and pen
@@ -158,7 +143,6 @@ void Draw::paintEvent(QPaintEvent *event)
             qp.drawLine(s_point,e_point);
         }
 
-
     //Draw contour line labes
     for (Edge c:contours_labeled)
     {
@@ -166,16 +150,27 @@ void Draw::paintEvent(QPaintEvent *event)
         QPoint3D s_point = c.getStart();
         QPoint3D e_point = c.getEnd();
 
-        //Label offset
-//        double offset = rand()%5 + 1;
+        //Index of delaunay points (nearest points to the edge)
+        int i_right = Algorithms::getDelaunayPoint(s_point, e_point, points);
+        int i_left = Algorithms::getDelaunayPoint(e_point, s_point, points);
+
+        //Get points
+        QPoint3D p_right = points[i_right];
+        QPoint3D p_left = points[i_left];
+
+        //Get height difference between contour line and nearest points on both sides
+        double dz_right = p_right.getZ() - s_point.getZ();
+        double dz_left = p_left.getZ() - s_point.getZ();
+
+        //Angle of contour line
+        double s = atan2((e_point.y()-s_point.y()), (e_point.x() - s_point.x()));
+
+        //Orientate labels towards uphill
+        if (dz_right > 0 || dz_left < 0)
+            s+=M_PI;
 
         //Center of contour line
         QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
-
-        //Angle of contour line
-        double s = atan((e_point.y()-s_point.y())/ (e_point.x() - s_point.x()));
-        if  (s < 0)
-            s+=2*M_PI;
 
         //Transform canvas to origin of axes
         QTransform t;
@@ -267,7 +262,7 @@ void Draw::paintEvent(QPaintEvent *event)
             QPoint3D e_point = e.getEnd();
 
             //Draw line
-            qp.setPen(QPen(Qt::black, 0.5));
+            qp.setPen(QPen(Qt::black, 0.2));
             qp.drawLine(s_point,e_point);
         }
     }
