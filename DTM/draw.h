@@ -25,7 +25,7 @@ private:
     int z_min, z_max;
     double scale;
     double trans_x, trans_y;
-    int delta_x, delta_y;
+    int offset_x, offset_y;
     QString set_col;
     QString method;
     bool contoursUp;
@@ -59,8 +59,8 @@ public:
     double getScale(){return scale;}
     double getTransX(){return trans_x;}
     double getTransY(){return trans_y;}
-    int getDeltaX(){return delta_x;}
-    int getDeltaY(){return delta_y;}
+    int getDeltaX(){return offset_x;}
+    int getDeltaY(){return offset_y;}
     int getContourInterval(){return k;}
 
     //Setters
@@ -78,7 +78,7 @@ public:
     void setCSVPoints(std::vector<QPoint3D> &csv_points){points.insert(points.end(), csv_points.begin(), csv_points.end());}
     void setScale(double &scale_){scale = scale_;}
     void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
-    void setDeltas(int &delta_x_, int &delta_y_){delta_x = delta_x_; delta_y = delta_y_;}
+    void setOffsets(int &offset_x_, int &offset_y_){offset_x = offset_x_; offset_y = offset_y_;}
     void setContoursLabeled(std::vector<Edge> &contours_labeled_){contours_labeled=contours_labeled_;}
     void setAnalyzeMethod(QString method_){method = method_;}
     void setContourUp(bool contoursUp_ ) {contoursUp = contoursUp_;}

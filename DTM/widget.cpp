@@ -103,16 +103,16 @@ void Widget::on_pushButton_3_clicked()
         double z_max = ui->lineEdit_2->text().toDouble();
         int dz = ui->lineEdit_3->text().toInt();
         int contour_interval = ui->lineEdit_4->text().toInt();
-        double label_distance_threshold = 150;
+        double label_distance_threshold = 250;
         double edge_length_threshold = 6;
-        double label_offset = 0; //rand()%100;
+        double label_offset = rand()%50;
 
         //Create contours
         std::vector<Edge> contours = Algorithms::getContourLines(dt, z_min, z_max, dz);
 
         //Get main labeled contour lines
         std::vector<Edge> contours_main;
-        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(points, contours, contours_main, contour_interval, dz, label_distance_threshold, edge_length_threshold, label_offset);
+        std::vector<Edge> contours_labeled = Algorithms::getLabeledContours(contours, contours_main, contour_interval, dz, label_distance_threshold, edge_length_threshold, label_offset);
 
         ui->Canvas->setContoursMain(contours_main);
         ui->Canvas->setContoursLabeled(contours_labeled);
@@ -271,12 +271,12 @@ void Widget::on_pushButton_Load_clicked()
         int x_left_top = ui->Canvas->geometry().x();
         int y_left_top = ui->Canvas->geometry().y();
 
-        //Get left top corner (origin ofset)
-        int delta_x = ui->Canvas->x();
-        int delta_y = ui->Canvas->y();
+        //Get left top corner (origin offset)
+        int offset_x = ui->Canvas->x();
+        int offset_y = ui->Canvas->y();
 
         //Set offsets
-        ui->Canvas->setDeltas(delta_x, delta_y);
+        ui->Canvas->setOffsets(offset_x, offset_y);
 
         //Get translation parameter for transformation
         double x_trans = x_min - x_left_top;

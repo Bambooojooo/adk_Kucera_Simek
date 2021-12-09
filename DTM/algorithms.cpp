@@ -262,8 +262,7 @@ std::vector<Edge> Algorithms::getContourLines(std::vector<Edge> &dt, double zmin
         double z3 = p3.getZ();
 
         //Check all horizontal planes
-//        for (double z = 0; z <= zmax; z+=dz)
-        for (double z = zmin; z <= zmax; z+=dz)
+        for (double z = zmin-((int)zmin%dz); z <= zmax; z+=dz)
         {
             //Height differences
             double dz1 = z1 - z;
@@ -527,7 +526,7 @@ std::vector<QPoint3D> Algorithms::generateRidge(std::vector<QPoint3D> &points)
     return points;
 }
 
-std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y)
+std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y)
 {
     //Transform polygon coorinates by basic transformation based on minmax box of dataset
     //x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
@@ -536,16 +535,16 @@ std::vector<QPoint3D> Algorithms::transformPoints(std::vector<QPoint3D> &points_
     for (QPoint3D p : points_3d)
     {
         //Translation with slight offset due to canvas origin set on [11,11] coors
-        double dx = p.x()-trans_x-delta_x;
-        double dy = p.y()-trans_y-delta_y;
+        double dx = p.x()-trans_x-offset_x;
+        double dy = p.y()-trans_y-offset_y;
 
         //Data scaling
         double ddx = dx*(scale/1.1);
         double ddy = dy*(scale/1.1);
 
         //Translate data back to visible part of Canvas
-        double x0 = ddx + delta_x;
-        double y0 = ddy + delta_y;
+        double x0 = ddx + offset_x;
+        double y0 = ddy + offset_y;
 
         points_transformed.push_back(QPoint3D(x0, y0, p.getZ()));
     }
@@ -579,7 +578,7 @@ std::map<double, std::vector<Edge>> Algorithms::getMainContourLines(std::vector<
     return contours_main;
 }
 
-std::vector<Edge> Algorithms::getLabeledContours(std::vector<QPoint3D> &points, std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &distance_threshold, double &length_threshold, double &offset)
+std::vector<Edge> Algorithms::getLabeledContours(std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &distance_threshold, double &length_threshold, double &offset)
 {
     //Get contour lines where height labels needs to be labeled
     std::vector<Edge> distanced_edges;

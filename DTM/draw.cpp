@@ -151,42 +151,49 @@ void Draw::paintEvent(QPaintEvent *event)
         QPoint3D e_point = c.getEnd();
 
         //Index of delaunay points (nearest points to the edge)
-        int i_right = Algorithms::getDelaunayPoint(s_point, e_point, points);
-        int i_left = Algorithms::getDelaunayPoint(e_point, s_point, points);
+//        int i_right = Algorithms::getDelaunayPoint(s_point, e_point, points);
+//        int i_left = Algorithms::getDelaunayPoint(e_point, s_point, points);
 
-        //Get points
-        QPoint3D p_right = points[i_right];
-        QPoint3D p_left = points[i_left];
+        int i_left = Algorithms::getDelaunayPoint(s_point, e_point, points);
+        int i_right = Algorithms::getDelaunayPoint(e_point, s_point, points);
 
-        //Get height difference between contour line and nearest points on both sides
-        double dz_right = p_right.getZ() - s_point.getZ();
-        double dz_left = p_left.getZ() - s_point.getZ();
+        //If at least one delaunay point exist
+        if ((i_right != -1) && (i_left != -1))
+        {
+            //Get points
+            QPoint3D p_left = points[i_left];
+            QPoint3D p_right = points[i_right];
 
-        //Angle of contour line
-        double s = atan2((e_point.y()-s_point.y()), (e_point.x() - s_point.x()));
+            //Get height difference between contour line and nearest points on both sides
+            double dz_left = p_left.getZ() - s_point.getZ();
+            double dz_right = p_right.getZ() - s_point.getZ();
 
-        //Orientate labels towards uphill
-        if (dz_right > 0 || dz_left < 0)
-            s+=M_PI;
+            //Angle of contour line
+            double s = atan2((e_point.y()-s_point.y()), (e_point.x() - s_point.x()));
 
-        //Center of contour line
-        QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
+            //Orientate labels towards uphill
+            if ((dz_right < 0) || (dz_left > 0))
+                s+=M_PI;
 
-        //Transform canvas to origin of axes
-        QTransform t;
-        t.translate(z.x(), z.y());
-        t.rotate(s*180/M_PI);
-        qp.setTransform(t);
+            //Center of contour line
+            QPoint3D z((s_point.x()+e_point.x())/2, (s_point.y()+e_point.y())/2);
 
-        //Draw hidding line of contour line
-        qp.setPen(QPen(Qt::white,5));
-        qp.drawLine(QPoint(5,0),QPoint(25,0));
-        QColor brown("#a52a2a");
-        qp.setPen(QPen(brown,1));
+            //Transform canvas to origin of axes
+            QTransform t;
+            t.translate(z.x(), z.y());
+            t.rotate(s*180/M_PI);
+            qp.setTransform(t);
 
-        //Draw text
-        qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
-        qp.resetTransform();
+            //Draw hidding line of contour line
+            qp.setPen(QPen(Qt::white,5));
+            qp.drawLine(QPoint(5,0),QPoint(25,0));
+            QColor brown("#a52a2a");
+            qp.setPen(QPen(brown,1));
+
+            //Draw text
+            qp.drawText(QPoint3D(5,5), QString::number(s_point.getZ()));
+            qp.resetTransform();
+        }
     }
 
     if (!contoursUp)

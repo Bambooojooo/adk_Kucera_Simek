@@ -37,8 +37,8 @@ public:
     static QPoint3D getContourPoint(QPoint3D &p1, QPoint3D &p2, double z);
     static std::vector<Edge> getContourLines(std::vector<Edge> &dt, double zmin, double zmax, int dz);
     static std::map<double, std::vector<Edge>> getMainContourLines(std::vector<Edge> &contours, int contour_interval, double dz);
-    static std::vector<QPoint3D> transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &delta_x, int &delta_y);
-    static std::vector<Edge> getLabeledContours(std::vector<QPoint3D> &points, std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &distance_threshold, double &length_threshold, double &offset);
+    static std::vector<QPoint3D> transformPoints(std::vector<QPoint3D> &points_3d, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y);
+    static std::vector<Edge> getLabeledContours(std::vector<Edge> &contours, std::vector<Edge> &contours_main, int contour_interval, double dz, double &distance_threshold, double &length_threshold, double &offset);
     static std::vector<Edge> getDistancedEdges(std::vector<Edge> &edges, double &distance_threshold, double &length_threshold, double &offset);
     static std::vector<std::vector<Edge>> chainEdges(std::vector<Edge> &edges);
     static double getMinSlope(std::vector<Triangle> &triangles);
