@@ -334,3 +334,21 @@ void Widget::on_dmtUP_clicked()
     repaint();
 }
 
+
+void Widget::on_checkBox_2_stateChanged(int arg1)
+{
+
+}
+
+
+void Widget::on_checkBox_2_clicked()
+{
+
+}
+
+
+void Widget::on_save_clicked()
+{
+
+}
+
