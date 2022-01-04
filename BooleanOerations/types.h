@@ -4,6 +4,7 @@
 
 //Foward declaration
 class QPointFBO;
+class Edge;
 
 //Position of point and line
 typedef enum{
@@ -39,6 +40,6 @@ typedef enum{
 typedef std::vector<QPointFBO> TPolygon;
 
 //Edges
-//typedef  std::vector<Edge> TEdges;
+typedef  std::vector<Edge> TEdges;
 
 #endif // TYPES_H
