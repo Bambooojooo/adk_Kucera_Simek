@@ -19,6 +19,7 @@ public:
     void setEdgePositions(TPolygon &A, TPolygon &B);
     void selectEdges(TPolygon &P, TPointPolygonPosition pos, TEdges &edges);
     TEdges createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &op);
+    static std::vector<std::pair<std::string, QPointFBO>> transformPoints(std::vector<std::pair<std::string, QPointFBO>> &points, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y);
 };
 
 #endif // ALGORITHMS_H

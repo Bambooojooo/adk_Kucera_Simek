@@ -14,6 +14,10 @@ private:
     TEdges res;
     bool addA;
 
+    double scale;
+    double trans_x, trans_y;
+    int offset_x, offset_y;
+
 public:
     explicit Draw(QWidget *parent = nullptr);
     void paintEvent(QPaintEvent *event);
@@ -26,6 +30,16 @@ public:
     void clear(){res.clear();}
     void clearAll(){A.clear(); B.clear(); res.clear();}
 
+    double getScale(){return scale;}
+    double getTransX(){return trans_x;}
+    double getTransY(){return trans_y;}
+    int getDeltaX(){return offset_x;}
+    int getDeltaY(){return offset_y;}
+    void setScale(double &scale_){scale = scale_;}
+    void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
+    void setOffsets(int &offset_x_, int &offset_y_){offset_x = offset_x_; offset_y = offset_y_;}
+    void drawCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &points_3d);
+    void setCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &csv_points);
 signals:
 
 public slots:

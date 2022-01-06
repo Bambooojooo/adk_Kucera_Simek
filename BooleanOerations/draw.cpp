@@ -1,4 +1,7 @@
 #include "draw.h"
+#include "algorithms.h"
+
+#include <string>
 
 Draw::Draw(QWidget *parent) : QWidget(parent)
 {
@@ -11,13 +14,19 @@ void Draw::paintEvent(QPaintEvent *event)
     qp.begin(this);
 
     //Draw polygons
+    qp.setPen(QPen(Qt::blue, 1));
     drawPolygon(A, qp);
+    qp.setPen(QPen(Qt::green, 1));
     drawPolygon(B, qp);
 
     //Draw edges
-    qp.setPen(Qt::red);
+    qp.setPen(QPen(Qt::red, 2));
     for(Edge e:res)
+        {
         qp.drawLine(e.getStart(), e.getEnd());
+        qp.drawEllipse(e.getStart().x()-4,e.getStart().y()-4,2*4,2*4);
+        qp.drawEllipse(e.getEnd().x()-4,e.getEnd().y()-4,2*4,2*4);
+        }
 
     qp.end();
 }
@@ -58,3 +67,34 @@ void Draw::drawPolygon(TPolygon &polygon, QPainter &qp)
     qp.drawPolygon(pol);
 }
 
+void Draw::drawCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &points)
+{
+    //Get transformation parameters
+    double trans_x = getTransX();
+    double trans_y = getTransY();
+    double scale = getScale();
+    int delta_x = getDeltaX();
+    int delta_y = getDeltaY();
+
+    //Draw vector of points
+    std::vector<std::pair<std::string, QPointFBO>> transformedPoints = Algorithms::transformPoints(points, trans_x, trans_y, scale, delta_x, delta_y);
+    Draw::setCSVPoints(transformedPoints);
+
+    repaint();
+}
+
+void Draw::setCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &csv_points)
+{
+    //Set A and B polygon coordinates
+    for (std::pair<std::string, QPointFBO> p: csv_points)
+    {
+        if (p.first == "A")
+        {
+            A.push_back(p.second);
+        }
+        else if (p.first == "B")
+        {
+            B.push_back(p.second);
+        }
+    }
+}

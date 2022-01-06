@@ -27,6 +27,13 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
+      <widget class="QPushButton" name="pushButton_LoadA">
+       <property name="text">
+        <string>Load A,B</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>Swicht A/B</string>

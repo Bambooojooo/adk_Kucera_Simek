@@ -17,12 +17,18 @@ TPointLinePosition Algorithms:: getPointLinePosition(QPointFBO &a,QPointFBO &p1,
     //Half plane test(cross product)
     double t = ux*vy-vx*uy;
 
+    //Line length
+    double s = sqrt(ux*ux + uy*uy);
+
+    //Normalized half plane test
+    double tn = t/s;
+
     //Point in the left halfplane
-    if (t > eps)
+    if (tn > eps)
         return LeftHP;
 
     //Point in the right halfplane
-    if (t < -eps)
+    if (tn < -eps)
         return RightHP;
 
     //Point on the line
@@ -67,6 +73,46 @@ TPointPolygonPosition Algorithms::getPositionWinding(QPointFBO &q, TPolygon &pol
 
         // Point and line segment position
         TPointLinePosition pos = getPointLinePosition(q, pol[i], pol[(i+1)%n]);
+
+        //Point on the line
+    if (pos == On)
+    {
+        //Coors if bbox
+        double x_min = 0;
+        double x_max = 0;
+        double y_min = 0;
+        double y_max = 0;
+
+        //Difference tolerance
+        double eps = 8;
+
+        //Make bbox
+        if (pol[i].x() <= pol[(i+1)%n].x())
+        {
+            x_min = pol[i].x();
+            x_max = pol[(i+1)%n].x();
+        }
+        else
+        {
+            x_min = pol[(i+1)%n].x();
+            x_max = pol[i].x();
+        }
+
+        if (pol[i].y() <= pol[(i+1)%n].y())
+        {
+            y_min = pol[i].y();
+            y_max = pol[(i+1)%n].y();
+        }
+        else
+        {
+            y_min = pol[(i+1)%n].y();
+            y_max = pol[i].y();
+        }
+
+        //Point on the line
+        if ((q.x() >= (x_min-eps)) && (q.x() <= (x_max+eps)) && (q.y() >= (y_min-eps)) && (q.y() <= (y_max+eps)))
+            return Boundary;
+    }
 
         //Point in the left halfplane
         if (pos==LeftHP)
@@ -266,6 +312,8 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     {
         selectEdges(A, Outer, result);
         selectEdges(B, Outer, result);
+        selectEdges(A, Boundary, result);
+        selectEdges(B, Boundary, result);
     }
 
     //Intersection
@@ -273,6 +321,8 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     {
         selectEdges(A, Inner, result);
         selectEdges(B, Inner, result);
+        selectEdges(A, Boundary, result);
+//        selectEdges(B, Boundary, result);
     }
 
     //DifferenceA_B
@@ -290,4 +340,32 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     }
 
     return result;
+}
+
+std::vector<std::pair<std::string, QPointFBO>> Algorithms::transformPoints(std::vector<std::pair<std::string, QPointFBO>> &points, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y)
+{
+    //Transform polygon coorinates by basic transformation based on minmax box of dataset
+    //x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
+    std::vector<std::pair<std::string, QPointFBO>> points_transformed;
+
+    for (std::pair<std::string, QPointFBO> p : points)
+    {
+        //Translation with slight offset due to canvas origin set on [11,11] coors
+        double dx = p.second.x()-trans_x-offset_x;
+        double dy = p.second.y()-trans_y-offset_y;
+
+        //Data scaling
+        double ddx = dx*(scale/1.1);
+        double ddy = dy*(scale/1.1);
+
+        //Translate data back to visible part of Canvas
+        double x0 = ddx + offset_x;
+        double y0 = ddy + offset_y;
+
+        points_transformed.push_back(std::make_pair(p.first, QPointFBO(x0, y0)));
+
+    }
+
+    //Compute transformation key
+    return points_transformed;
 }
