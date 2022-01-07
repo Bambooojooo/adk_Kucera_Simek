@@ -13,7 +13,6 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
-
 }
 
 
@@ -34,11 +33,30 @@ void Widget::on_pushButton_2_clicked()
     //Get polygons and Boolean operation
     TPolygon A = ui->Canvas->getA();
     TPolygon B = ui->Canvas->getB();
+    std::vector<TPolygon> polygons = ui->Canvas->getPolygons();
     TBooleanOperation op = (TBooleanOperation)ui->comboBox->currentIndex();
 
-    //Create overlay of polygons
-    Algorithms a;
-    TEdges res = a.createOverlay(A, B, op);
+    //Create overlay of drawn polygons A and B
+    TEdges res = Algorithms::createOverlay(A, B, op);
+
+    //Create overlay of all loaded polygons using mmb operation optimization
+    if (polygons.size() > 0)
+    {
+        //Go through each polygon
+        for (int i=0; i<polygons.size()-1; i++)
+        {
+            //For each polygon pair
+            for (int j=i+1; j<polygons.size(); j++)
+            {
+                //If there is polygon mmb intersection
+                if (Algorithms::MMBoxIntersection(polygons[i], polygons[j]))
+                {
+                    TEdges polygon_res = Algorithms::createOverlay(polygons[i], polygons[j], op);
+                    res.insert(res.end(), polygon_res.begin(), polygon_res.end());
+                }
+            }
+        }
+    }
 
     //Set result
     ui->Canvas->setEdges(res);
@@ -81,7 +99,7 @@ void Widget::on_pushButton_LoadA_clicked()
         //Read the file with chosen path
         std::vector<std::vector<std::string>> csv_content = CSV::read_csv(filename);
 
-        std::vector<std::pair<std::string, QPointFBO>> points = CSV::getPoints(csv_content, x_min, x_max, y_min, y_max);
+        std::vector<TPolygon> polygons = CSV::getCSVPolygons(csv_content, x_min, x_max, y_min, y_max);
 
         //Get canvas size
         int canvas_width = ui->Canvas->size().width();
@@ -101,7 +119,10 @@ void Widget::on_pushButton_LoadA_clicked()
             scale = x_ratio;
         else
             scale = y_ratio;
-        ui->Canvas->setScale(scale);
+
+        //Set scale
+        if (ui->Canvas->polygonsSize() == 0)
+            ui->Canvas->setScale(scale);
 
         //Get canvas left top corner coors
         int x_left_top = ui->Canvas->geometry().x();
@@ -112,16 +133,18 @@ void Widget::on_pushButton_LoadA_clicked()
         int offset_y = ui->Canvas->y();
 
         //Set offsets
-        ui->Canvas->setOffsets(offset_x, offset_y);
+        if (ui->Canvas->polygonsSize() == 0)
+            ui->Canvas->setOffsets(offset_x, offset_y);
 
         //Get translation parameter for transformation
         double x_trans = x_min - x_left_top;
         double y_trans = y_min - y_left_top;
 
         //Set translations
-        ui->Canvas->setTrans(x_trans, y_trans);
+        if (ui->Canvas->polygonsSize() == 0)
+            ui->Canvas->setTrans(x_trans, y_trans);
 
         //Draw points
-        ui->Canvas->drawCSVPoints(points);
+        ui->Canvas->drawCSVPolygons(polygons);
     }
 }

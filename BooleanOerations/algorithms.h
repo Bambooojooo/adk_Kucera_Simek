@@ -10,16 +10,17 @@ class Algorithms
 public:
     Algorithms(){};
 
-    TPointLinePosition getPointLinePosition(QPointFBO &a,QPointFBO &p1,QPointFBO &p2);
-    double get2LinesAngle(QPointFBO &p1, QPointFBO &p2, QPointFBO &p3, QPointFBO &p4);
-    TPointPolygonPosition getPositionWinding(QPointFBO &q, TPolygon &pol);
-    std::tuple<QPointFBO,T2LinesPosition> get2LinesIntersection(QPointFBO &p1, QPointFBO &p2, QPointFBO&p3, QPointFBO &p4);
-    void updatePolygons(TPolygon &A, TPolygon &B);
-    void processIntersection(QPointFBO &b, double t, int &index, TPolygon &P);
-    void setEdgePositions(TPolygon &A, TPolygon &B);
-    void selectEdges(TPolygon &P, TPointPolygonPosition pos, TEdges &edges);
-    TEdges createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &op);
-    static std::vector<std::pair<std::string, QPointFBO>> transformPoints(std::vector<std::pair<std::string, QPointFBO>> &points, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y);
+    static TPointLinePosition getPointLinePosition(QPointFBO &a,QPointFBO &p1,QPointFBO &p2);
+    static double get2LinesAngle(QPointFBO &p1, QPointFBO &p2, QPointFBO &p3, QPointFBO &p4);
+    static TPointPolygonPosition getPositionWinding(QPointFBO &q, TPolygon &pol);
+    static std::tuple<QPointFBO,T2LinesPosition> get2LinesIntersection(QPointFBO &p1, QPointFBO &p2, QPointFBO&p3, QPointFBO &p4);
+    static void updatePolygons(TPolygon &A, TPolygon &B);
+    static void processIntersection(QPointFBO &b, double t, int &index, TPolygon &P);
+    static void setEdgePositions(TPolygon &A, TPolygon &B);
+    static void selectEdges(TPolygon &P, TPointPolygonPosition pos, TEdges &edges);
+    static TEdges createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &op);
+    static std::vector<TPolygon> transformPolygons(std::vector<TPolygon> &polygons, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y);
+    static bool MMBoxIntersection(TPolygon &A, TPolygon &B);
 };
 
 #endif // ALGORITHMS_H

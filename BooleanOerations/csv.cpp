@@ -1,5 +1,6 @@
 #include "csv.h"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -60,40 +61,87 @@ std::vector<std::vector<std::string>> CSV::read_csv(std::string &filename)
     return result;
 }
 
-std::vector<std::pair<std::string, QPointFBO>> CSV::getPoints(std::vector<std::vector<std::string>> &csv_content, double &x_min, double &x_max, double &y_min, double &y_max)
+std::vector<TPolygon> CSV::getCSVPolygons(std::vector<std::vector<std::string>> &csv_content, double &x_min, double &x_max, double &y_min, double &y_max)
 {
 	//Return vector of QPoints3D from vector of lines (csv lines) and update minmax box
     std::vector<std::pair<std::string, QPointFBO>> points;
+    std::vector<TPolygon> result;
 
-	//Point variables declaration
-	int id;
-    double x, y;
-    std::string polygon;
-
-	//Go through each line (point)
-	for(std::vector<std::string> line:  csv_content)
+    //Go through each line (polygon)
+    for(std::vector<std::string> polygon_points:  csv_content)
 	{
-		//Convert strings to integer and double values
-        polygon = line[0];
-        id = std::stoi(line[1]);
-        x  = std::stod(line[2]);
-        y  = std::stod(line[3]);
+        TPolygon polygon;
 
-		//Update minmax box
-		if(x < x_min)
-			x_min = x;
+        //Remove first symbols of string wich are not digits (which is usually some WKT text)
+        while ((!isdigit(polygon_points[0][0])) && (polygon_points[0][0] != '-'))
+            polygon_points[0].erase(0,1);
 
-		if(x > x_max)
-			x_max = x;
 
-		if(y < y_min)
-			y_min = y;
 
-		if(y > y_max)
-			y_max = y;
+        for (std::string point: polygon_points)
+        {
+            //Remove quotes, round brackets and first from line string
+            point.erase(std::remove(point.begin(), point.end(), '"'), point.end());
+            point.erase(std::remove(point.begin(), point.end(), '('), point.end());
+            point.erase(std::remove(point.begin(), point.end(), ')'), point.end());
 
-        points.push_back(std::make_pair(polygon, QPointFBO(x, y)));
-	}
+            // Help vars
+            int pairIterator = 0;
+            int x, y;
+            std::string coordinate;
+            std::stringstream ss2(point);
 
-    return points;
+            //Go through every coordinate in point
+            while(std::getline(ss2, coordinate, ' '))
+            {
+                if (coordinate == "")
+                    continue;
+
+                //If coordinate pair incomplete (must include both x and y)
+                if (pairIterator < 2)
+                {
+                    //If there is x coor to read
+                    if (pairIterator == 0)
+                    {
+                        //Convert string value to integer value
+                        x = (std::stod(coordinate));
+
+                        //Update minmax box coors
+                        if (x < x_min)
+                            x_min = x;
+
+                        if (x > x_max)
+                            x_max = x;
+
+                        pairIterator++;
+                    }
+                    //If there is y coor to read
+                    else if (pairIterator == 1)
+                    {
+                        //Convert string value to integer value
+                        y = -(std::stod(coordinate));
+
+                        //Update minmax box coors
+                        if (y < y_min)
+                            y_min = y;
+
+                        if (y > y_max)
+                            y_max = y;
+
+                        pairIterator++;
+                    }
+                }
+            }
+
+            //Store the pair of coordinates and reset pair iterator
+            if (pairIterator == 2)
+            {
+                polygon.push_back(QPointFBO(x,y));
+                pairIterator = 0;
+            }
+        }
+        //Store the object of a line
+        result.push_back(polygon);
+    }
+    return result;
 }

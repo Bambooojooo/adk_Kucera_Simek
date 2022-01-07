@@ -11,12 +11,13 @@ class Draw : public QWidget
 
 private:
     TPolygon A, B;
+    std::vector<TPolygon> polygons;
     TEdges res;
     bool addA;
-
     double scale;
     double trans_x, trans_y;
     int offset_x, offset_y;
+
 
 public:
     explicit Draw(QWidget *parent = nullptr);
@@ -28,7 +29,7 @@ public:
     TPolygon getB(){return B;}
     void setEdges(TEdges &edg){res = edg;}
     void clear(){res.clear();}
-    void clearAll(){A.clear(); B.clear(); res.clear();}
+    void clearAll(){A.clear(); B.clear(); res.clear(); polygons.clear();}
 
     double getScale(){return scale;}
     double getTransX(){return trans_x;}
@@ -38,8 +39,10 @@ public:
     void setScale(double &scale_){scale = scale_;}
     void setTrans(double &trans_x_, double &trans_y_){trans_x = trans_x_; trans_y = trans_y_;}
     void setOffsets(int &offset_x_, int &offset_y_){offset_x = offset_x_; offset_y = offset_y_;}
-    void drawCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &points_3d);
-    void setCSVPoints(std::vector<std::pair<std::string, QPointFBO>> &csv_points);
+    void drawCSVPolygons(std::vector<TPolygon> &polygons);
+    void setCSVPolygons(std::vector<TPolygon> &polygons_){polygons.insert(polygons.end(), polygons_.begin(), polygons_.end());}
+    std::vector<TPolygon> getPolygons(){return polygons;}
+    int polygonsSize(){return polygons.size();}
 signals:
 
 public slots:

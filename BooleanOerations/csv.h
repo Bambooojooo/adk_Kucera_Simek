@@ -12,7 +12,7 @@ class CSV
 {
 public:
 	static std::vector<std::vector<std::string>> read_csv(std::string &filename);
-    static std::vector<std::pair<std::string, QPointFBO>> getPoints(std::vector<std::vector<std::string>> &csv_content, double &x_min, double &x_max, double &y_min, double &y_max);
+    static std::vector<TPolygon> getCSVPolygons(std::vector<std::vector<std::string>> &csv_content, double &x_min, double &x_max, double &y_min, double &y_max);
 };
 
 #endif // CSV_H

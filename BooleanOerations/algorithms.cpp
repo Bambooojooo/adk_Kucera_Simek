@@ -155,6 +155,7 @@ std::tuple<QPointFBO,T2LinesPosition> Algorithms::get2LinesIntersection(QPointFB
     //Const
     double eps = 1.0e-15;
 
+    // !!!!!!!!For colinearity works only sometimes (test k1, k2, k3 does not always works for following conditions)!!!!!!!
     //Colinear lines
     if ((fabs(k1) < eps) && (fabs(k2) < eps) && (fabs(k3) < eps))
     {
@@ -321,8 +322,8 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     {
         selectEdges(A, Inner, result);
         selectEdges(B, Inner, result);
-        selectEdges(A, Boundary, result);
-//        selectEdges(B, Boundary, result);
+//        selectEdges(A, Boundary, result);
+        selectEdges(B, Boundary, result);
     }
 
     //DifferenceA_B
@@ -330,6 +331,7 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     {
         selectEdges(A, Outer, result);
         selectEdges(B, Inner, result);
+        selectEdges(A, Boundary, result);
     }
 
     //DifferenceB_A
@@ -337,35 +339,86 @@ TEdges Algorithms:: createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &o
     {
         selectEdges(A, Inner, result);
         selectEdges(B, Outer, result);
+        selectEdges(B, Boundary, result);
     }
 
     return result;
 }
 
-std::vector<std::pair<std::string, QPointFBO>> Algorithms::transformPoints(std::vector<std::pair<std::string, QPointFBO>> &points, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y)
+std::vector<TPolygon> Algorithms::transformPolygons(std::vector<TPolygon> &polygons, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y)
 {
     //Transform polygon coorinates by basic transformation based on minmax box of dataset
     //x_min, x_max, y_min, y_max represent boundaries of dataset minmax box
-    std::vector<std::pair<std::string, QPointFBO>> points_transformed;
+    std::vector<TPolygon> polygons_transformed;
 
-    for (std::pair<std::string, QPointFBO> p : points)
+    //Process all polygons
+    for (TPolygon polygon: polygons)
     {
-        //Translation with slight offset due to canvas origin set on [11,11] coors
-        double dx = p.second.x()-trans_x-offset_x;
-        double dy = p.second.y()-trans_y-offset_y;
+        //Declare polygon wich will be transformed
+        TPolygon polygon_transformed;
 
-        //Data scaling
-        double ddx = dx*(scale/1.1);
-        double ddy = dy*(scale/1.1);
+        for (QPointFBO p: polygon)
+        {
+            //Translation with slight offset due to canvas origin set on [11,11] coors
+            double dx = p.x()-trans_x-offset_x;
+            double dy = p.y()-trans_y-offset_y;
 
-        //Translate data back to visible part of Canvas
-        double x0 = ddx + offset_x;
-        double y0 = ddy + offset_y;
+            //Data scaling
+            double ddx = dx*(scale/1.1);
+            double ddy = dy*(scale/1.1);
 
-        points_transformed.push_back(std::make_pair(p.first, QPointFBO(x0, y0)));
+            //Translate data back to visible part of Canvas
+            double x0 = ddx + offset_x;
+            double y0 = ddy + offset_y;
 
+            polygon_transformed.push_back(QPointFBO(x0, y0));
+        }
+        polygons_transformed.push_back(polygon_transformed);
     }
 
     //Compute transformation key
-    return points_transformed;
+    return polygons_transformed;
+}
+
+bool Algorithms::MMBoxIntersection(TPolygon &A, TPolygon &B)
+{
+    //Return true if there is a mmb intersection
+    double xmin_a = -10.e10, xmax_a = 10.e10, ymin_a = -10.e10, ymax_a = 10.e10;
+    double xmin_b = -10.e10, xmax_b = 10.e10, ymin_b = -10.e10, ymax_b = 10.e10;
+
+    //Get mmb of A
+    for (QPointFBO p: A)
+    {
+        //Update minmax box coors
+        if (p.x() < xmin_a)
+            xmin_a = p.x();
+
+        if (p.x() > xmax_a)
+            xmax_a = p.x();
+
+        if (p.y() < ymin_a)
+            ymin_a = p.y();
+
+        if (p.y() > ymax_a)
+            ymax_a = p.y();
+    }
+
+    //Get mmb of A
+    for (QPointFBO p: B)
+    {
+        //Update minmax box coors
+        if (p.x() < xmin_b)
+            xmin_b = p.x();
+
+        if (p.x() > xmax_b)
+            xmax_b = p.x();
+
+        if (p.y() < ymin_b)
+            ymin_b = p.y();
+
+        if (p.y() > ymax_b)
+            ymax_b = p.y();
+    }
+
+    return ((xmax_a >= xmin_b) && (xmax_b >= xmin_a) && (ymax_a >= ymin_b) && (ymax_b >= ymin_a));
 }
