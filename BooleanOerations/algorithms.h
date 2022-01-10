@@ -20,7 +20,7 @@ public:
     static void selectEdges(TPolygon &P, TPointPolygonPosition pos, TEdges &edges);
     static TEdges createOverlay(TPolygon &A, TPolygon &B, TBooleanOperation &op);
     static std::vector<TPolygon> transformPolygons(std::vector<TPolygon> &polygons, double &trans_x, double &trans_y, double &scale, int &offset_x, int &offset_y);
-    static bool MMBoxIntersection(TPolygon &A, TPolygon &B);
+    static bool BBoxIntersection(TPolygon &A, TPolygon &B);
 };
 
 #endif // ALGORITHMS_H

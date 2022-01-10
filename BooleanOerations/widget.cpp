@@ -49,7 +49,7 @@ void Widget::on_pushButton_2_clicked()
             for (int j=i+1; j<polygons.size(); j++)
             {
                 //If there is polygon mmb intersection
-                if (Algorithms::MMBoxIntersection(polygons[i], polygons[j]))
+                if (Algorithms::BBoxIntersection(polygons[i], polygons[j]))
                 {
                     TEdges polygon_res = Algorithms::createOverlay(polygons[i], polygons[j], op);
                     res.insert(res.end(), polygon_res.begin(), polygon_res.end());

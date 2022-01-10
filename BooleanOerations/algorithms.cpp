@@ -380,7 +380,7 @@ std::vector<TPolygon> Algorithms::transformPolygons(std::vector<TPolygon> &polyg
     return polygons_transformed;
 }
 
-bool Algorithms::MMBoxIntersection(TPolygon &A, TPolygon &B)
+bool Algorithms::BBoxIntersection(TPolygon &A, TPolygon &B)
 {
     //Return true if there is a mmb intersection
     double xmin_a = -10.e10, xmax_a = 10.e10, ymin_a = -10.e10, ymax_a = 10.e10;
